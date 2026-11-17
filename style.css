@@ -259,3 +259,5 @@ body.retrying .part,body.retrying .tip{display:none}
 .ptext .ch .sl{display:none}
 .ptext .ch{gap:4px}
 body.retrying .guide .gram{margin-top:0}
+.part .now{color:var(--accent);font-size:16px}
+.guide .aw{margin:14px 0 2px;font-size:17px;color:var(--brand-dark)}

@@ -2,10 +2,12 @@
    B2 First Adventure – DỮ LIỆU BÀI HỌC
    (sách Grammar and Vocabulary for First and First for Schools)
    ---------------------------------------------------------------------
-   • OPEN_WEEK: tuần đang mở. Mỗi tuần thêm 1 bài vào LESSONS rồi tăng số này.
+   • OPEN_WEEK: tuần đang mở. LESSONS[tuần] = mảng các bài của tuần (link ?w=tuần&b=số bài), mỗi bài nộp riêng.
+     Mỗi tuần: bài 1 = Grammar (không có ô chép từ, chỉ highlight), bài 2 = Vocabulary.
      Các bài tuần trước vẫn mở để học sinh xem lại. Cô xem trước bài chưa mở: ?w=2&preview
    • Chữ highlight (bấm xem nghĩa + máy đọc): {{khoá}} hoặc {{khoá|chữ hiển thị}}; khoá phải có trong VOCAB.
-   • newWords = ô "New words" đầu bài (chép vở): từ B1 trở lên hoặc liên quan ngữ pháp; từ dễ hơn chỉ lấy khi ít gặp.
+   • newWords = ô "New words" (chép vở), CHỈ bài Vocabulary: từ thuộc nội dung chính của bài (B1 trở lên, từ dễ hơn chỉ khi ít gặp).
+     newWordsAfter = từ chính nhưng là đáp án → chỉ hiện trong ô New words sau khi nộp xong. Bài Grammar: newWords = [].
      KHÔNG lấy từ trong câu lệnh đề bài (vẫn highlight), KHÔNG lấy từ là đáp án chưa hiện ra.
      Từ quá hiếm (C2, văn chương) chỉ highlight trong bài.
    • Chỗ làm bài:
@@ -89,6 +91,19 @@ const VOCAB = {
   'tropic':         { w: 'tropic', ipa: '/ˈtrɒpɪk/', vi: 'vùng nhiệt đới' },
   'forecast':       { w: 'forecast', ipa: '/ˈfɔːkɑːst/', vi: 'dự báo (thời tiết)' },
   'crash':          { w: 'crash', ipa: '/kræʃ/', vi: 'đập mạnh vào' },
+  'stormy':         { w: 'stormy', ipa: '/ˈstɔːmi/', vi: 'có bão, giông gió' },
+  /* Từ chính là đáp án: chỉ hiện trong ô New words sau khi nộp xong (newWordsAfter) */
+  'trunks':         { w: 'trunks', ipa: '/trʌŋks/', vi: 'thân cây' },
+  'sunlight':       { w: 'sunlight', ipa: '/ˈsʌnlaɪt/', vi: 'ánh nắng, ánh sáng mặt trời' },
+  'soil':           { w: 'soil', ipa: '/sɔɪl/', vi: 'đất (trồng cây)' },
+  'roots':          { w: 'roots', ipa: '/ruːts/', vi: 'rễ cây' },
+  'branches':       { w: 'branches', ipa: '/ˈbrɑːntʃɪz/', vi: 'cành cây' },
+  'insects':        { w: 'insects', ipa: '/ˈɪnsekts/', vi: 'côn trùng' },
+  'frozen':         { w: 'frozen', ipa: '/ˈfrəʊzn/', vi: 'đóng băng' },
+  'misty':          { w: 'misty', ipa: '/ˈmɪsti/', vi: 'có sương mù' },
+  'tropical':       { w: 'tropical', ipa: '/ˈtrɒpɪkl/', vi: 'nhiệt đới' },
+  'warmth':         { w: 'warmth', ipa: '/wɔːmθ/', vi: 'sự ấm áp, hơi ấm' },
+  'global':         { w: 'global', ipa: '/ˈɡləʊbl/', vi: 'toàn cầu (global warming = sự nóng lên toàn cầu)' },
   /* Reading Part 6 – A trip to Patagonia */
   'pumas':          { w: 'pumas', ipa: '/ˈpjuːməz/', vi: 'báo sư tử (puma)' },
   'portion':        { w: 'portion', ipa: '/ˈpɔːʃn/', vi: 'một phần (của vùng đất)' },
@@ -138,19 +153,11 @@ const VOCAB = {
 
 /* ---------- BÀI HỌC THEO TUẦN ---------- */
 const LESSONS = {
-  /* ===================== TUẦN 1 – Unit 1 + Unit 25 ===================== */
-  1: {
-    code: 'Unit 1 + 25', title: 'Present tenses · Earth, sea and sky',
-    newWords: [
-      'mend', 'odd', 'rude', 'manners', 'bad-tempered', 'in public', 'portions', 'scenery', 'behave', 'manner',
-      'venue', 'rehearse', 'performers', 'appreciate', 'portable',
-      'bank', 'orchards', 'peaks', 'pine', 'slopes', 'springs', 'streams', 'tracks', 'valleys', 'vegetation',
-      'surrounded', 'towering', 'dense', 'shallow', 'landscape', 'breathtaking', 'fertile', 'winding', 'emerge', 'tend to',
-      'cultivated', 'mountainous', 'muddy', 'steep', 'gentle', 'freeze', 'globe', 'mist', 'forecast',
-      'glaciers', 'tackle', 'trek', 'leisurely', 'spot', 'startling', 'plains', 'majestic', 'sighting', 'vulnerable',
-      'wilderness', 'exhilarated', 'utterly', 'fleeting', 'glimpse', 'upright', 'avalanche', 'disturbance',
-      'guarantees', 'apparently', 'rumours', 'plentiful',
-    ],
+  /* ===================== TUẦN 1 – 2 bài: Grammar Unit 1 (?w=1&b=1) + Vocabulary Unit 25 (?w=1&b=2) ===================== */
+  1: [{
+    kind: 'Grammar', icon: '📘', code: 'Unit 1', title: 'Present tenses',
+    // Bài ngữ pháp: KHÔNG có ô chép từ mới, chỉ highlight từ khó trong bài
+    newWords: [],
     // Ô Grammar: tóm tắt thật ngắn, ví dụ KHÔNG trùng với câu / động từ trong bài tập
     grammar: `
       <h4>1. Hiện tại đơn: V / V-s</h4>
@@ -180,7 +187,7 @@ const LESSONS = {
       </ul>`,
     ex: [
       /* Bài 1 (Grammar ex 1) – chọn câu đúng */
-      { id: 'g1', type: 'list', stack: true, part: '📘 Present tenses',
+      { id: 'g1', type: 'list', stack: true,
         title: 'Choose the correct sentence',
         how: 'Tap the correct sentence in each pair.',
         examples: [ '((a. My brother lives with us until he can find a flat of his own./*b. My brother is living with us until he can find a flat of his own.))' ],
@@ -244,8 +251,20 @@ const LESSONS = {
             h: 'Nghe đoạn cuối: Martin nói mình “not a very patient person”…' },
         ] },
 
-      /* Bài 5 (Unit 25 – 1.2) – Manali */
-      { id: 'v12', type: 'text', part: '🌍 Earth, sea and sky', img: 'u25-manali.jpg',
+    ],
+  }, {
+    kind: 'Vocabulary', icon: '🌍', code: 'Unit 25', title: 'Earth, sea and sky',
+    // Ô chép vở: CHỈ từ thuộc nội dung chính của bài (địa lý, phong cảnh, khí hậu, thời tiết).
+    // Từ khó khác trong bài chỉ highlight. newWordsAfter = từ chính là đáp án → chỉ hiện sau khi nộp xong.
+    newWords: [
+      'peaks', 'pine', 'streams', 'vegetation', 'slopes', 'orchards', 'tracks', 'valleys', 'bank', 'springs',
+      'landscape', 'snow-capped', 'fertile', 'shallow', 'narrow', 'winding', 'muddy', 'cultivated', 'flat', 'mountainous',
+      'gentle', 'steep', 'stormy', 'forecast', 'glaciers', 'plains', 'avalanche',
+    ],
+    newWordsAfter: ['trunks', 'sunlight', 'soil', 'roots', 'branches', 'insects', 'frozen', 'misty', 'tropical', 'warmth', 'global'],
+    ex: [
+      /* Bài 1 (Unit 25 – 1.2) – Manali */
+      { id: 'v12', type: 'text', img: 'u25-manali.jpg',
         only: ['bank', 'orchards', 'pine', 'slopes', 'springs', 'streams', 'tracks', 'valleys', 'vegetation'],
         title: 'Manali, India',
         how: 'Complete the description with the words in the box.',
@@ -257,7 +276,7 @@ const LESSONS = {
             h: ['Đường mòn nhỏ để đi bộ. Số nhiều.', 'Vùng đất thấp nằm giữa các ngọn núi. Số nhiều.', 'Phần đất dọc hai bên sông.', 'Nơi nước nóng tự trào lên từ lòng đất. Số nhiều.'] },
         ] },
 
-      /* Bài 6 (Unit 25 – 1.3) – nghe: rainforest */
+      /* Bài 2 (Unit 25 – 1.3) – nghe: rainforest */
       { id: 'v13', type: 'text', track: 'u25-rainforest', img: 'u25-rainforest.jpg',
         title: 'A tropical rainforest',
         how: 'Listen to the description of this photo and complete it with the words you hear.',
@@ -268,7 +287,7 @@ const LESSONS = {
             h: ['Lớp đất cây mọc lên.', 'Phần của cây nằm dưới đất. Số nhiều.', 'Phần mọc ra từ thân cây. Số nhiều.', 'Những con vật nhỏ có 6 chân. Số nhiều.', 'Con vật bay, cánh nhiều màu. Chú ý chính tả số nhiều của từ tận cùng bằng -y.'] },
         ] },
 
-      /* Bài 7 (Unit 25 – 1.4) – từ trái nghĩa */
+      /* Bài 3 (Unit 25 – 1.4) – từ trái nghĩa */
       { id: 'v14', type: 'list',
         only: ['cultivated', 'mountainous', 'muddy', 'steep', 'straight', 'wide'],
         title: 'Opposites',
@@ -284,7 +303,7 @@ const LESSONS = {
           { t: '{{gentle}} ↔ [[steep]]', h: '“gentle” (con dốc) = thoai thoải.' },
         ] },
 
-      /* Bài 8 (Unit 25 – 3.1) – word building */
+      /* Bài 4 (Unit 25 – 3.1) – word building */
       { id: 'v31', type: 'list',
         title: 'Word building',
         how: 'Complete the sentences with new words made from the words in the box.',
@@ -298,7 +317,7 @@ const LESSONS = {
           { t: 'It is thought that some unusual weather is caused by [[global]] warming.', h: 'Cần tính từ đứng trước “warming”. Hiện tượng “nóng lên toàn cầu”.' },
         ] },
 
-      /* Bài 9 – Reading and Use of English Part 6 (không lấy Writing) */
+      /* Bài 5 – Reading and Use of English Part 6 (không lấy Writing) */
       { id: 'rue6', type: 'text',
         title: 'Reading Part 6: A trip to Patagonia',
         how: 'Six sentences have been removed from the article. Choose from the sentences A–G the one which fits each gap. There is one extra sentence.',
@@ -330,5 +349,5 @@ const LESSONS = {
           { t: 'On the final day I said goodbye and drove out of the park. The closest I had come to seeing a puma may have been a {{fleeting}} {{glimpse}} but I realised it mattered little. For my search had made me study every {{crag}} and cave, bush and {{boulder}} in this vast, ultimately unknowable land all the more intensely.' },
         ] },
     ],
-  },
+  }],
 };

@@ -118,12 +118,18 @@ const NOUN_HINT = {
 };
 
 /* ============ ĐIỀU HƯỚNG ============ */
-const WEEK_NO = parseInt(new URLSearchParams(location.search).get('w'), 10);
+// Mỗi tuần có thể có nhiều bài (LESSONS[w] là mảng): ?w=1&b=1 (Grammar), ?w=1&b=2 (Vocabulary)…
+const QP = new URLSearchParams(location.search);
+const WEEK_NO = parseInt(QP.get('w'), 10);
+const PART_NO = parseInt(QP.get('b'), 10) || 1;
 // ?w=2&preview: cô xem trước bài chưa mở (học sinh không thấy link này trên trang chủ)
-const PREVIEW = new URLSearchParams(location.search).has('preview');
-const LESSON = WEEK_NO && (WEEK_NO <= OPEN_WEEK || PREVIEW) ? LESSONS[WEEK_NO] : null;
+const PREVIEW = QP.has('preview');
+const lessonsOf = w => [].concat(LESSONS[w] || []);
+const LESSON = WEEK_NO && (WEEK_NO <= OPEN_WEEK || PREVIEW) ? lessonsOf(WEEK_NO)[PART_NO - 1] || null : null;
 const ME_KEY = 'b2-me';
-const storeKey = w => 'b2-w' + w;
+const storeKey = (w, b) => 'b2-w' + w + '-' + (b || 1);
+// Từ chép vở của 1 bài: newWords + newWordsAfter (từ là đáp án, chỉ hiện sau khi nộp xong)
+const wordsOf = (L, done) => (L.newWords || []).concat(done ? L.newWordsAfter || [] : []);
 
 // Câu chào trang chủ: mỗi lần mở đổi 1 câu (không lặp lại câu lần trước)
 const HI_LINES = [
@@ -160,30 +166,32 @@ function renderHome(){
   const next = LESSONS[OPEN_WEEK + 1];
   const me = lsGet(ME_KEY) || {};
   const first = String(me.name || '').trim().split(/\s+/).pop();
-  let stars = 0, words = 0;
-  weeks.forEach(w => { const n = starsOf(lsGet(storeKey(w))); stars += n; if (n) words += (LESSONS[w].newWords || []).length; });
+  let stars = 0, words = 0, done = 0;
+  weeks.forEach(w => lessonsOf(w).forEach((L, i) => {
+    const n = starsOf(lsGet(storeKey(w, i + 1))); stars += n; if (n){ done++; words += wordsOf(L, true).length; }
+  }));
   $('#app').innerHTML = `<section class="card hi">
       <h2>Hi ${first ? esc(first) : 'superstar'}! 🌟</h2>
       <p class="hiline">${hiLine()}</p>
       <div class="stats">
         <div class="stat"><b>⭐ ${stars}</b><span>stars</span></div>
         <div class="stat"><b>📒 ${words}</b><span>new words</span></div>
-        <div class="stat"><b>🏁 ${weeks.filter(w => starsOf(lsGet(storeKey(w)))).length}</b><span>adventures</span></div>
+        <div class="stat"><b>🏁 ${done}</b><span>adventures</span></div>
       </div>
       ${stars ? '' : '<p class="muted small" style="margin:10px 0 0">Your first stars are waiting for you! ⭐</p>'}
     </section>
-    ${weeks.map(w => {
-      const L = LESSONS[w], s = lsGet(storeKey(w)) || {};
+    ${weeks.map(w => `<h2 class="part">Week ${w}${w === OPEN_WEEK ? ' · <span class="now">This week</span>' : ''}</h2>` + lessonsOf(w).map((L, i) => {
+      const s = lsGet(storeKey(w, i + 1)) || {};
       const r = s.r2 || s.r1;
       const st = s.phase === 'done' ? `<span class="tag ok stars">${starRow(starsOf(s))}${r ? ' ' + r.score + '/' + r.total : ''}</span>`
         : s.phase === 'retry' || s.phase === 'review' ? '<span class="tag warn">✏️ Làm lại câu sai</span>'
         : s.startedAt ? '<span class="tag">⏳ In progress</span>' : '<span class="tag new">🆕 New</span>';
-      return `<a class="card lesson" href="?w=${w}">
-        <div class="lnum">${w}</div>
-        <div class="linfo"><div class="lt">Week ${w}${w === OPEN_WEEK ? ' · <b class="now">This week</b>' : ''}</div>
-          <div class="ln">${esc(L.code)} · ${esc(L.title)}</div></div>
+      return `<a class="card lesson" href="?w=${w}&b=${i + 1}">
+        <div class="lnum">${L.icon || w}</div>
+        <div class="linfo"><div class="lt">${esc(L.kind)} · ${esc(L.code)}</div>
+          <div class="ln">${esc(L.title)}</div></div>
         <div>${st}</div></a>`;
-    }).join('')}
+    }).join('')).join('')}
     ${next ? `<div class="card lesson locked"><div class="lnum">🔒</div><div class="linfo"><div class="lt">Week ${OPEN_WEEK + 1}</div><div class="ln">Next adventure unlocks soon!</div></div></div>` : ''}`;
 }
 
@@ -241,7 +249,7 @@ function qText(q){
 let S = null;
 // phase: work → (Submit) review: xem đúng/sai, khoá hết → (Làm lại câu sai) retry: chỉ hiện câu sai + gợi ý → (Nộp lần 2) done
 const blank = () => ({ name: '', cls: '', startedAt: null, leaves: 0, a: {}, tick: {}, rec: {}, phase: 'work', r1: null, r2: null, sid: '', sent1: false, sent2: false, retryAt: null });
-const save = () => lsSet(storeKey(WEEK_NO), S);
+const save = () => lsSet(storeKey(WEEK_NO, PART_NO), S);
 
 /* ============ GHI ÂM (giống KET; lưu IndexedDB để không mất khi đóng trang) ============ */
 // RECS = các ô ghi âm của bài: đọc to (1 file/bài) và bài nói (1 file/câu)
@@ -269,7 +277,7 @@ const within = (p, ms = 4000) => Promise.race([p, new Promise((_, rej) => setTim
 async function idbPut(k, v){ const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('rec', 'readwrite'); t.objectStore('rec').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
 async function idbGet(k){ const d = await idb(); return new Promise((res, rej) => { const q = d.transaction('rec').objectStore('rec').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => rej(q.error); }); }
 const RECBLOB = {};
-const recId = qk => 'w' + WEEK_NO + '-' + qk;
+const recId = qk => 'w' + WEEK_NO + '-' + PART_NO + '-' + qk;
 async function storeRec(qk, blob){ RECBLOB[qk] = blob; try { await within(blob.arrayBuffer().then(buf => idbPut(recId(qk), { buf, type: blob.type }))); } catch (e) {} }
 async function loadRec(qk){
   if (RECBLOB[qk]) return RECBLOB[qk];
@@ -433,9 +441,16 @@ function exLabel(e){
     }).join('')}</div>`;
 }
 
+const vRow = k => `<div class="vi">${vt('{{' + k + '}}')}<span class="vipa">${esc(VOCAB[k].ipa)}</span><span class="vmean">${esc(VOCAB[k].vi)}</span></div>`;
+// Từ là đáp án (newWordsAfter): chỉ hiện trong ô New words sau khi nộp xong
+function paintAfterWords(){
+  const box = $('#afterWords'); if (!box) return;
+  const ws = (LESSON.newWordsAfter || []).filter(k => VOCAB[k]);
+  box.innerHTML = S.phase === 'done' && ws.length ? `<h3 class="aw">🔓 More new words from your answers</h3><div class="vgrid">${ws.map(vRow).join('')}</div>` : '';
+}
 function buildLesson(){
-  document.title = 'B2 First ' + LESSON.code + ' · ' + LESSON.title;
-  $('#heroSub').textContent = `Week ${WEEK_NO} · ${LESSON.code}: ${LESSON.title}`;
+  document.title = 'B2 ' + LESSON.kind + ' · ' + LESSON.title;
+  $('#heroSub').textContent = `Week ${WEEK_NO} · ${LESSON.kind} · ${LESSON.code}: ${LESSON.title}`;
   buildQS(); buildRecs();
   const allWords = (LESSON.newWords || []).filter(k => VOCAB[k]);
   $('#app').innerHTML = `
@@ -452,10 +467,13 @@ function buildLesson(){
       <div id="summaryBox"></div>
       <div class="card who" id="whoBar"></div>
       <section class="card guide">
-        <h2>📒 New words</h2>
+        ${allWords.length ? `<h2>📒 New words</h2>
         <div class="note">✍️ Chép từ mới vào vở nha! Chạm vào từ màu vàng để xem nghĩa.</div>
-        <div class="vgrid">${allWords.map(k => `<div class="vi">${vt('{{' + k + '}}')}<span class="vipa">${esc(VOCAB[k].ipa)}</span><span class="vmean">${esc(VOCAB[k].vi)}</span></div>`).join('')}</div>
-        ${LESSON.grammar ? `<details class="gram"><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammar}</div></details>` : ''}
+        <div class="vgrid">${allWords.map(vRow).join('')}</div>
+        <div id="afterWords"></div>`
+        : `<h2>📘 ${esc(LESSON.title)}</h2>
+        <div class="note">💡 Chưa biết từ nào thì chạm vào từ màu vàng để xem nghĩa.</div>`}
+        ${LESSON.grammar ? `<details class="gram"${allWords.length ? '' : ' open'}><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammar}</div></details>` : ''}
       </section>
       ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${
         e.type === 'label' ? exLabel(e) : e.type === 'pics' ? exPics(e) : e.type === 'text' ? exText(e) : e.type === 'speak' ? exSpeak(e) : exList(e)}</section>`).join('')}
@@ -698,7 +716,7 @@ function renderSummary(){
     ${R.score < R.total ? '<div class="big">Let’s review the answers below 👇</div>' : ''}</div></div>`;
   updateStatus();
 }
-function paintAll(){ paintMarks(); paintChoices(); paintTicks(); paintRec(); focusWrong(S.phase === 'retry'); renderTop(); renderSummary(); renderWho(); progress(); }
+function paintAll(){ paintAfterWords(); paintMarks(); paintChoices(); paintTicks(); paintRec(); focusWrong(S.phase === 'retry'); renderTop(); renderSummary(); renderWho(); progress(); }
 
 /* ============ NỘP BÀI ============ */
 async function onSubmit(){
@@ -754,7 +772,7 @@ const secsBetween = (a, b) => a && b ? Math.max(0, Math.round((new Date(b) - new
 
 // Giống các trang BTVN khác: lần 1 gửi ngay; lần 2 gửi kèm kết quả lần 1 để mail so sánh 2 lần.
 const makeSid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-const base = () => ({ app: 'btvn', unit: 'B2 First', title: `B2 First ${LESSON.code} ${LESSON.title} – Week ${WEEK_NO}`, name: S.name, cls: S.cls, sid: S.sid || '' });
+const base = () => ({ app: 'btvn', unit: 'B2 ' + LESSON.kind, title: `B2 First ${LESSON.kind} ${LESSON.code} ${LESSON.title} – Week ${WEEK_NO}`, name: S.name, cls: S.cls, sid: S.sid || '' });
 // withRec: mail lần 1 có thêm các dòng ghi âm (cô chấm, file đính kèm); mail lần 2 chỉ so sánh câu chấm điểm
 function itemsOf(R, withRec){
   const out = [];
@@ -846,7 +864,7 @@ window.addEventListener('focus', comeBack);
     renderHome(); return;
   }
   $('#back').hidden = false;
-  S = Object.assign(blank(), lsGet(storeKey(WEEK_NO)) || {});
+  S = Object.assign(blank(), lsGet(storeKey(WEEK_NO, PART_NO)) || {});
   buildLesson();
   $('#submitBtn').addEventListener('click', onSubmit);
   if (S.startedAt && S.name) showWork();

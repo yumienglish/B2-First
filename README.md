@@ -5,7 +5,7 @@ Trang bài tập về nhà tự học cho lớp B2 First (sách *Grammar and Voc
 Link cho học sinh: https://yumienglish.github.io/B2-First/
 
 ## Cấu trúc
-- `index.html`: trang chủ (danh sách bài) và trang bài làm (`?w=1`, `?w=2`…). Cô xem trước bài chưa mở: `?w=2&preview`
+- `index.html`: trang chủ (danh sách bài) và trang bài làm (`?w=1&b=1` = Grammar, `?w=1&b=2` = Vocabulary…). Mỗi tuần 2 bài, nộp riêng. Cô xem trước bài chưa mở: `?w=2&b=1&preview`
 - `lessons.js`: **dữ liệu bài học**: `OPEN_WEEK`, `VOCAB` (từ mới: nghĩa, phiên âm), `LESSONS` (đề, đáp án, gợi ý, ô Grammar)
 - `app.js`: giao diện, chấm điểm, làm lại câu sai, gửi bài
 - `img/`: ảnh cắt từ sách, `img/meme/`: meme cảm xúc của cô sau lần nộp 1
