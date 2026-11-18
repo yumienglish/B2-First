@@ -408,7 +408,7 @@ function exHead(e){
     ${e.box && e.type !== 'label' && !e.drag ? `<div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div>` : ''}
     ${e.img ? `<img class="eximg" src="img/${e.img}" alt="" loading="lazy">` : ''}
     ${e.sents && !e.drag ? `<div class="sents">${e.sents.map((s, j) => `<div class="sent"><b>${'ABCDEFGH'[j]}</b><span>${vt(s)}</span></div>`).join('')}</div>` : ''}
-    ${e.drag ? bankOf(e) : ''}`;
+`;
 }
 // Hình minh hoạ tạo bằng ChatGPT: img/ai/<tên>.jpg – chưa có file thì tự ẩn
 const aiImg = n => `<img class="aiimg" src="img/ai/${n}.jpg" alt="" loading="lazy" onerror="this.remove()">`;
@@ -420,7 +420,7 @@ const chipsOf = e => e.sents ? e.sents.map((s, j) => ({ w: LET[j], s }))
   : e.box.filter(w => !w.startsWith('~')).map(w => ({ w: unv(w), key: (w.match(/^\{\{([^}|]+)/) || [])[1] }));
 function bankOf(e){
   return `<div class="bank${e.sents ? ' sbank' : ''}" data-bank="${e.id}">
-    <div class="bank-h">👆 Drag ${e.sents ? 'a sentence' : 'a word'} into a gap – or tap it, then tap a gap.</div>
+    <div class="bank-h">👆 Drag ${e.sents ? 'a sentence' : 'a word'} into a gap<span class="bh2"> – or tap it, then tap a gap</span>.</div>
     <div class="chips">${chipsOf(e).map(c => e.sents
       ? `<div class="chip schip" data-ex="${e.id}" data-w="${c.w}" role="button" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><b class="cl">${c.w}</b><span>${vt(c.s)}</span></div>`
       : `<div class="chip" data-ex="${e.id}" data-w="${esc(c.w)}" role="button" tabindex="0">${esc(c.w)}${c.key && VOCAB[c.key] ? `<button type="button" class="vw vq" data-v="${esc(c.key)}" aria-label="Meaning">?</button>` : ''}</div>`).join('')}</div>
@@ -506,6 +506,7 @@ document.addEventListener('pointerup', ev => dragEnd(ev, true));
 document.addEventListener('pointercancel', ev => dragEnd(ev, false));
 // nút ✓/✗ (ý kiến riêng, không chấm điểm)
 const tickBtns = k => `<span class="tk" data-tk="${k}"><button type="button" class="tkb" data-v="y" aria-label="Important">✓</button><button type="button" class="tkb" data-v="n" aria-label="Not important">✗</button></span>`;
+const exBody = e => e.type === 'label' ? exLabel(e) : e.type === 'pics' ? exPics(e) : e.type === 'text' ? exText(e) : e.type === 'speak' ? exSpeak(e) : exList(e);
 function exList(e){
   const ex = (e.examples || []).map((t, j) => `<div class="it example${e.conv ? ' conv' : ''}"><span class="cn">▶</span><div class="itb">${renderT(t, null, true)}${e.tick ? tickBtns(e.id + '-ex' + (j || '')) : ''}</div></div>`).join('');
   return `<div class="items">${ex}${itemsOfEx(e).map(it => `<div class="it${e.conv ? ' conv' : ''}" data-item="${e.id}-${it.n}">
@@ -579,8 +580,8 @@ function buildLesson(){
         <div class="note">💡 Chưa biết từ nào thì chạm vào từ màu vàng để xem nghĩa.</div>`}
         ${LESSON.grammar ? `<details class="gram" open><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammarImg ? aiImg(LESSON.grammarImg) : ''}${LESSON.grammar}</div></details>` : ''}
       </section>
-      ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${
-        e.type === 'label' ? exLabel(e) : e.type === 'pics' ? exPics(e) : e.type === 'text' ? exText(e) : e.type === 'speak' ? exSpeak(e) : exList(e)}</section>`).join('')}
+      ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${e.drag
+        ? `<div class="dz${e.sents ? ' dzs' : ''}"><div class="dz-work">${exBody(e)}</div><aside class="dz-side">${bankOf(e)}</aside></div>` : exBody(e)}</section>`).join('')}
     </div>`;
 
   // gõ chữ
@@ -725,8 +726,9 @@ function focusWrong(on){
 }
 function renderTop(){
   const tb = $('#topbar'); if (!tb) return;
-  if (S.phase !== 'review' && S.phase !== 'retry'){ tb.hidden = true; return; }
-  tb.hidden = false;
+  const stick = () => document.documentElement.style.setProperty('--stick', (tb.hidden ? 12 : tb.offsetHeight + 20) + 'px');
+  if (S.phase !== 'review' && S.phase !== 'retry'){ tb.hidden = true; stick(); return; }
+  tb.hidden = false; requestAnimationFrame(stick);
   if (S.phase === 'review'){
     tb.innerHTML = `<div class="tt">Lần 1: ${S.r1.score}/${S.r1.total} · ❌ Sai ${wrongKeys().length} câu</div><button class="btn orange" type="button" id="retryBtn">✏️ Làm lại câu sai</button>`;
     $('#retryBtn').onclick = startRetry;

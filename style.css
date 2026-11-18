@@ -322,3 +322,30 @@ body.dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .pk.spk{display:flex;gap:8px;text-align:left;font-weight:600;font-size:15.5px;width:100%;line-height:1.45}
 .pk.clr{margin-top:8px;border-color:var(--bad);color:var(--bad)}
 main{position:relative;z-index:1}
+
+/* ===== Bài kéo thả: bài làm bên trái, khung từ bên phải, khung từ dính theo khi cuộn ===== */
+:root{--stick:12px}
+.dz{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,26%);gap:18px;align-items:start}
+.dz.dzs{grid-template-columns:minmax(0,1fr) minmax(280px,38%)}
+.dz-side{position:sticky;top:var(--stick);z-index:5;max-height:calc(100vh - var(--stick) - 90px);overflow-y:auto;overscroll-behavior:contain;border-radius:16px}
+.dz-side .bank{margin:0;box-shadow:0 6px 18px rgba(18,122,138,.18)}
+.dz-work{min-width:0}
+@media (max-width:700px){
+  .dz{grid-template-columns:minmax(0,1fr) 37%;gap:8px}
+  .dz.dzs{grid-template-columns:minmax(0,1fr) 50%}
+  .dz:not(.dzs) .dz-side .chips{flex-direction:column;align-items:stretch}
+  .dz-side .bank{padding:8px 6px}
+  .dz-side .bank-h{font-size:12.5px;line-height:1.35;margin-bottom:6px}
+  .dz-side .bh2{display:none}
+  .dz-side .chips{gap:6px}
+  .dz-side .chip{font-size:14.5px;padding:6px 6px;border-radius:10px;flex-wrap:wrap;gap:3px;justify-content:space-between}
+  .dz-side .chip .vq{font-size:11px;padding:0 5px}
+  .dz-side .schip{flex-wrap:nowrap}
+  .dz-side .schip .vw{font-weight:700;padding:0 2px;margin:0;border-bottom-width:1.5px;hyphens:auto}
+  .dz-side .schip{font-size:12.5px;line-height:1.4;gap:4px;padding:6px 6px}
+  .dz-side .schip .cl{width:22px;height:22px;font-size:13px}
+  .dz-side .schip .grip{font-size:18px;padding:0 2px}
+  .dz .slot{min-width:4.5em;font-size:16px;padding:4px 8px}
+  .dz .sslot{font-size:14.5px}
+  .dz .ptext .para{line-height:2.4}
+}
