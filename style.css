@@ -349,3 +349,23 @@ main{position:relative;z-index:1}
   .dz .sslot{font-size:14.5px}
   .dz .ptext .para{line-height:2.4}
 }
+
+/* khung từ đứng cạnh bài gõ chữ (side: true) */
+.sidebox .wordbox{margin:0;background:#fff;gap:4px 12px}
+@media (max-width:700px){
+  .sidebox .wordbox{flex-direction:column;gap:2px;padding:8px 10px;font-size:15px;line-height:1.7}
+  .dz input.txt.gap{width:5.6em;font-size:16px;padding:3px 5px}
+}
+/* thanh audio dính trên màn hình khi cuộn qua bài nghe */
+.ex .listen{position:sticky;top:var(--stick);z-index:7;background:#fff;border-radius:14px;padding:6px 8px 2px;margin:0 -8px 8px;box-shadow:0 6px 16px rgba(20,60,90,.16)}
+.ex .listen audio{margin:0 0 4px}
+/* hình nhỏ cạnh từng câu (pics) */
+.it.haspic{align-items:center}
+.itpic{flex:none;width:clamp(96px,16vw,170px);aspect-ratio:1;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.it.haspic .itb{flex:1;min-width:0}
+.dz.dzw{grid-template-columns:minmax(0,1fr) minmax(200px,22%)}
+@media (max-width:700px){
+  .dz.dzw{grid-template-columns:minmax(0,1fr) 29%}
+  .itpic{width:82px}
+  .it.haspic{line-height:1.9;gap:8px}
+}

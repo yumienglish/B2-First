@@ -219,7 +219,7 @@ const LESSONS = {
         ] },
 
       /* Bài 3 (Grammar ex 4) – email, 19 chỗ trống */
-      { id: 'g4', type: 'text', ai: 'u1-roadtrip',
+      { id: 'g4', type: 'text', side: true, ai: 'u1-roadtrip',
         title: 'An email from the USA',
         how: 'Complete the email with the present simple or present continuous form of the verbs in the box.',
         box: ['{{behave}}', 'come', 'cost', 'eat', 'enjoy', 'feel', '~go', 'have', 'like', 'love', 'pay', '{{realise}}', 'say', 'seem', '{{serve}}', 'show', 'smile', 'stay', 'take', 'visit'],
@@ -284,7 +284,7 @@ const LESSONS = {
         ] },
 
       /* Bài 2 (Unit 25 – 1.3) – nghe: rainforest */
-      { id: 'v13', type: 'text', track: 'u25-rainforest', img: 'u25-rainforest.jpg', ai: 'u25-rainforest',
+      { id: 'v13', type: 'text', track: 'u25-rainforest', ai: 'u25-rainforest',
         title: 'A tropical rainforest',
         how: 'Listen to the description of this photo and complete it with the words you hear.',
         paras: [
@@ -295,7 +295,7 @@ const LESSONS = {
         ] },
 
       /* Bài 3 (Unit 25 – 1.4) – từ trái nghĩa */
-      { id: 'v14', type: 'list', drag: true, ai: 'u25-opposites',
+      { id: 'v14', type: 'list', drag: true,
         only: ['cultivated', 'mountainous', 'muddy', 'steep', 'straight', 'wide'],
         title: 'Opposites',
         how: 'Match the adjectives with their opposites. Write one word from the box.',
@@ -311,7 +311,7 @@ const LESSONS = {
         ] },
 
       /* Bài 4 (Unit 25 – 3.1) – word building */
-      { id: 'v31', type: 'list', ai: 'u25-weather',
+      { id: 'v31', type: 'list', pics: [0, 1, 2, 3, 4, 5].map(i => 'u25-weather-' + i),
         title: 'Word building',
         how: 'Complete the sentences with new words made from the words in the box.',
         box: ['{{freeze}}', '{{globe}}', '{{mist}}', '~storm', '{{tropic}}', 'warm'],

@@ -405,7 +405,7 @@ function exHead(e){
     ${e.tip ? `<p class="tip">💡 ${e.tip}</p>` : ''}
     ${ws.length ? `<div class="words"><span class="wl">📒 Words in the options:</span> ${ws.map(w => vt(`{{${w}}}`)).join(' ')}</div>` : ''}
     ${e.ai ? aiImg(e.ai) : ''}
-    ${e.box && e.type !== 'label' && !e.drag ? `<div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div>` : ''}
+    ${e.box && e.type !== 'label' && !e.drag && !e.side ? `<div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div>` : ''}
     ${e.img ? `<img class="eximg" src="img/${e.img}" alt="" loading="lazy">` : ''}
     ${e.sents && !e.drag ? `<div class="sents">${e.sents.map((s, j) => `<div class="sent"><b>${'ABCDEFGH'[j]}</b><span>${vt(s)}</span></div>`).join('')}</div>` : ''}
 `;
@@ -426,6 +426,8 @@ function bankOf(e){
       : `<div class="chip" data-ex="${e.id}" data-w="${esc(c.w)}" role="button" tabindex="0">${esc(c.w)}${c.key && VOCAB[c.key] ? `<button type="button" class="vw vq" data-v="${esc(c.key)}" aria-label="Meaning">?</button>` : ''}</div>`).join('')}</div>
   </div>`;
 }
+// khung từ đứng cạnh bài (side: true) – chỉ để nhìn, học sinh vẫn tự gõ
+const sideBox = e => `<div class="bank sidebox"><div class="bank-h">📦 Words in the box</div><div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div></div>`;
 let SEL = null; // thẻ đang chọn: { ex, w }
 const slotOpen = k => !!S && (S.phase === 'work' || (S.phase === 'retry' && S.r1 && !S.r1.items[k].ok));
 const slotHtml = (e, v) => !v ? `<span class="sph">${e.sents ? 'Drop a sentence here' : '&nbsp;'}</span>`
@@ -508,9 +510,10 @@ document.addEventListener('pointercancel', ev => dragEnd(ev, false));
 const tickBtns = k => `<span class="tk" data-tk="${k}"><button type="button" class="tkb" data-v="y" aria-label="Important">✓</button><button type="button" class="tkb" data-v="n" aria-label="Not important">✗</button></span>`;
 const exBody = e => e.type === 'label' ? exLabel(e) : e.type === 'pics' ? exPics(e) : e.type === 'text' ? exText(e) : e.type === 'speak' ? exSpeak(e) : exList(e);
 function exList(e){
-  const ex = (e.examples || []).map((t, j) => `<div class="it example${e.conv ? ' conv' : ''}"><span class="cn">▶</span><div class="itb">${renderT(t, null, true)}${e.tick ? tickBtns(e.id + '-ex' + (j || '')) : ''}</div></div>`).join('');
-  return `<div class="items">${ex}${itemsOfEx(e).map(it => `<div class="it${e.conv ? ' conv' : ''}" data-item="${e.id}-${it.n}">
-      <span class="cn">${it.n}</span><div class="itb">${renderT(it.t, keysOf(e, it))}${it.v ? ` <span class="vb">(${vt(it.v)})</span>` : ''}${e.tick ? tickBtns(e.id + '-' + it.n) : ''}${fixBox(e, it)}</div></div>`).join('')}</div>
+  const nx = (e.examples || []).length, pic = j => e.pics && e.pics[j] ? `<img class="itpic" src="img/ai/${e.pics[j]}.jpg" alt="" loading="lazy">` : '';
+  const ex = (e.examples || []).map((t, j) => `<div class="it example${e.conv ? ' conv' : ''}${e.pics ? ' haspic' : ''}"><span class="cn">▶</span>${pic(j)}<div class="itb">${renderT(t, null, true)}${e.tick ? tickBtns(e.id + '-ex' + (j || '')) : ''}</div></div>`).join('');
+  return `<div class="items">${ex}${itemsOfEx(e).map(it => `<div class="it${e.conv ? ' conv' : ''}${e.pics ? ' haspic' : ''}" data-item="${e.id}-${it.n}">
+      <span class="cn">${it.n}</span>${pic(nx + Number(it.n) - 1)}<div class="itb">${renderT(it.t, keysOf(e, it))}${it.v ? ` <span class="vb">(${vt(it.v)})</span>` : ''}${e.tick ? tickBtns(e.id + '-' + it.n) : ''}${fixBox(e, it)}</div></div>`).join('')}</div>
     ${e.readAloud ? `<div class="recbox"><h3>🎙 Read aloud</h3><p class="how">Now read all the sentences above aloud (with your answers) and record yourself.</p>
       <div class="sq" id="sq-${e.id}-ra"></div></div>` : ''}`;
 }
@@ -580,8 +583,8 @@ function buildLesson(){
         <div class="note">💡 Chưa biết từ nào thì chạm vào từ màu vàng để xem nghĩa.</div>`}
         ${LESSON.grammar ? `<details class="gram" open><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammarImg ? aiImg(LESSON.grammarImg) : ''}${LESSON.grammar}</div></details>` : ''}
       </section>
-      ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${e.drag
-        ? `<div class="dz${e.sents ? ' dzs' : ''}"><div class="dz-work">${exBody(e)}</div><aside class="dz-side">${bankOf(e)}</aside></div>` : exBody(e)}</section>`).join('')}
+      ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${e.drag || e.side
+        ? `<div class="dz${e.sents ? ' dzs' : ''}${e.side ? ' dzw' : ''}"><div class="dz-work">${exBody(e)}</div><aside class="dz-side">${e.drag ? bankOf(e) : sideBox(e)}</aside></div>` : exBody(e)}</section>`).join('')}
     </div>`;
 
   // gõ chữ

@@ -17,7 +17,7 @@ Link cho học sinh: https://yumienglish.github.io/B2-First/
 - `[[some]]`: ô gõ chữ (nhiều đáp án đúng thì ngăn bằng `|`)
 - `{{từ}}` hoặc `{{khoá|chữ hiện}}`: từ mới, chạm vào thì hiện nghĩa và máy đọc to
 - `h`: gợi ý khi làm lại câu sai (không ghi đáp án)
-- Bài: `part` (tiêu đề phần), `stack` (lựa chọn dài xếp dọc), `type: 'text'` (đoạn văn), `box` (khung từ, `~` = từ đã dùng ở ví dụ), `only`, `sents` (câu A–G cho Reading Part 6), `track`, `img`, `tip`, `drag` (kéo thả / chạm từ trong khung vào chỗ trống; khung từ thành cột bên phải, dính theo khi cuộn), `ai` (hình ChatGPT)
+- Bài: `part` (tiêu đề phần), `stack` (lựa chọn dài xếp dọc), `type: 'text'` (đoạn văn), `box` (khung từ, `~` = từ đã dùng ở ví dụ), `only`, `sents` (câu A–G cho Reading Part 6), `track`, `img`, `tip`, `drag` (kéo thả / chạm từ trong khung vào chỗ trống; khung từ thành cột bên phải, dính theo khi cuộn), `side` (bài gõ chữ nhưng khung từ cũng thành cột dính bên phải), `pics` (mảng tên hình img/ai: ví dụ trước rồi câu 1, 2… – hình nhỏ cạnh từng câu). Thanh audio (`track`) tự dính đầu màn hình khi cuộn, `ai` (hình ChatGPT)
 - Bài: `copy: false` = ô New words chỉ để học, không bắt chép; `newWordsAfter` = từ chính là đáp án, hiện sau khi nộp xong
 
 ## Mở bài tuần mới
