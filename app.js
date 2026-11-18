@@ -40,8 +40,15 @@ function showPop(btn){
   const p = $('#pop');
   p.innerHTML = `<div class="pw"><b>${esc(v.w)}</b> <button type="button" class="say" aria-label="Nghe lại">🔊</button></div>
     <div class="pi">${esc(v.ipa || '')}</div><div class="pv">${esc(v.vi)}</div>`;
+  p.onclick = null;
+  placePop(p, btn.getBoundingClientRect(), 280);
+  $('.say', p).onclick = () => say(v.w);
+  say(v.w);
+}
+// đặt bong bóng cạnh phần tử (trên hoặc dưới, không tràn màn hình)
+function placePop(p, r, maxW){
   p.hidden = false;
-  const r = btn.getBoundingClientRect(), pw = Math.min(280, window.innerWidth - 24);
+  const pw = Math.min(maxW, window.innerWidth - 24);
   p.style.width = pw + 'px';
   let left = r.left + r.width / 2 - pw / 2 + window.scrollX;
   left = Math.max(12 + window.scrollX, Math.min(left, window.scrollX + window.innerWidth - pw - 12));
@@ -49,8 +56,6 @@ function showPop(btn){
   const h = p.offsetHeight;
   const below = r.bottom + 8 + h < window.innerHeight || r.top < h + 16;
   p.style.top = (below ? r.bottom + 8 : r.top - h - 8) + window.scrollY + 'px';
-  $('.say', p).onclick = () => say(v.w);
-  say(v.w);
 }
 const hidePop = () => { const p = $('#pop'); if (p) p.hidden = true; };
 document.addEventListener('click', e => {
@@ -377,6 +382,8 @@ function renderT(t, keys, example){
         `<button type="button" class="opt${example && tok.correct.includes(oi) ? ' on' : ''}" data-i="${oi}"${example ? ' disabled' : ''}>${esc(unv(o))}</button>`).join('<span class="sl">/</span>')}</span>`;
     }
     if (example) return `<span class="exv">${esc(tok.kind === 'gap' ? tok.alts[0] : tok.sg)}</span>`;
+    // bài kéo thả: chỗ trống là ô thả (chạm để chọn từ)
+    if (q && q.e.drag) return `${num}<span class="gw"><button type="button" class="slot${q.e.sents ? ' sslot' : ''}" data-k="${k}" aria-label="Gap ${esc(q.label)}"></button></span>`;
     // ô trống giãn theo đáp án dài nhất (không để chữ bị che)
     const w = tok.kind === 'gap' ? Math.max(...tok.alts.map(a => a.length)) : 0;
     const st = w > 7 ? ` style="width:${Math.min(13, w * .62 + 2).toFixed(1)}em"` : '';
@@ -397,10 +404,106 @@ function exHead(e){
     <p class="how">${vt(e.how)}</p>
     ${e.tip ? `<p class="tip">💡 ${e.tip}</p>` : ''}
     ${ws.length ? `<div class="words"><span class="wl">📒 Words in the options:</span> ${ws.map(w => vt(`{{${w}}}`)).join(' ')}</div>` : ''}
-    ${e.box && e.type !== 'label' ? `<div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div>` : ''}
+    ${e.ai ? aiImg(e.ai) : ''}
+    ${e.box && e.type !== 'label' && !e.drag ? `<div class="wordbox">${e.box.map(w => w.startsWith('~') ? `<s>${unv(w.slice(1))}</s>` : `<span>${vt(w)}</span>`).join('')}</div>` : ''}
     ${e.img ? `<img class="eximg" src="img/${e.img}" alt="" loading="lazy">` : ''}
-    ${e.sents ? `<div class="sents">${e.sents.map((s, j) => `<div class="sent"><b>${'ABCDEFGH'[j]}</b><span>${vt(s)}</span></div>`).join('')}</div>` : ''}`;
+    ${e.sents && !e.drag ? `<div class="sents">${e.sents.map((s, j) => `<div class="sent"><b>${'ABCDEFGH'[j]}</b><span>${vt(s)}</span></div>`).join('')}</div>` : ''}
+    ${e.drag ? bankOf(e) : ''}`;
 }
+// Hình minh hoạ tạo bằng ChatGPT: img/ai/<tên>.jpg – chưa có file thì tự ẩn
+const aiImg = n => `<img class="aiimg" src="img/ai/${n}.jpg" alt="" loading="lazy" onerror="this.remove()">`;
+
+/* ============ KÉO THẢ / CHẠM ĐỂ ĐIỀN (bài drag: true) ============ */
+const LET = 'ABCDEFGH';
+// thẻ từ: từ trong khung (bỏ từ ~ ở ví dụ) hoặc câu A–G
+const chipsOf = e => e.sents ? e.sents.map((s, j) => ({ w: LET[j], s }))
+  : e.box.filter(w => !w.startsWith('~')).map(w => ({ w: unv(w), key: (w.match(/^\{\{([^}|]+)/) || [])[1] }));
+function bankOf(e){
+  return `<div class="bank${e.sents ? ' sbank' : ''}" data-bank="${e.id}">
+    <div class="bank-h">👆 Drag ${e.sents ? 'a sentence' : 'a word'} into a gap – or tap it, then tap a gap.</div>
+    <div class="chips">${chipsOf(e).map(c => e.sents
+      ? `<div class="chip schip" data-ex="${e.id}" data-w="${c.w}" role="button" tabindex="0"><span class="grip" aria-hidden="true">⠿</span><b class="cl">${c.w}</b><span>${vt(c.s)}</span></div>`
+      : `<div class="chip" data-ex="${e.id}" data-w="${esc(c.w)}" role="button" tabindex="0">${esc(c.w)}${c.key && VOCAB[c.key] ? `<button type="button" class="vw vq" data-v="${esc(c.key)}" aria-label="Meaning">?</button>` : ''}</div>`).join('')}</div>
+  </div>`;
+}
+let SEL = null; // thẻ đang chọn: { ex, w }
+const slotOpen = k => !!S && (S.phase === 'work' || (S.phase === 'retry' && S.r1 && !S.r1.items[k].ok));
+const slotHtml = (e, v) => !v ? `<span class="sph">${e.sents ? 'Drop a sentence here' : '&nbsp;'}</span>`
+  : e.sents ? `<b class="cl">${esc(v)}</b><span>${esc(plain(e.sents[LET.indexOf(v)] || ''))}</span>` : esc(v);
+function paintSlots(){
+  $$('.slot').forEach(b => {
+    const q = qOf(b.dataset.k); if (!q) return;
+    const v = String(S.a[q.k] || '');
+    b.innerHTML = slotHtml(q.e, v);
+    b.classList.toggle('filled', !!v);
+    b.disabled = !slotOpen(q.k);
+    b.classList.toggle('target', !!SEL && SEL.ex === q.e.id && !b.disabled);
+  });
+  $$('.chip').forEach(c => {
+    const e = LESSON.ex.find(x => x.id === c.dataset.ex);
+    c.classList.toggle('used', QS.some(q => q.e === e && String(S.a[q.k] || '') === c.dataset.w));
+    c.classList.toggle('sel', !!SEL && SEL.ex === c.dataset.ex && SEL.w === c.dataset.w);
+    c.classList.toggle('off', !(S.phase === 'work' || S.phase === 'retry'));
+  });
+}
+function setSlot(k, v){
+  if (!slotOpen(k)) return;
+  if (v) QS.forEach(q => { if (q.k !== k && q.e === qOf(k).e && S.a[q.k] === v && slotOpen(q.k)) S.a[q.k] = ''; }); // 1 thẻ chỉ ở 1 chỗ
+  S.a[k] = v || '';
+  const el = $(`.slot[data-k="${k}"]`); if (el) el.classList.remove('bad', 'ok');
+  save(); paintSlots(); progress(); if (S.phase === 'retry') topProgress();
+}
+// chạm vào chỗ trống (chưa chọn thẻ) → bảng chọn
+function openPicker(slot){
+  const q = qOf(slot.dataset.k), e = q.e, cur = String(S.a[q.k] || '');
+  const used = new Set(QS.filter(x => x.e === e && x.k !== q.k).map(x => String(S.a[x.k] || '')));
+  const p = $('#pop');
+  p.innerHTML = `<div class="pk-h">Choose ${e.sents ? 'a sentence' : 'a word'}:</div><div class="pks">${chipsOf(e).map(c =>
+    `<button type="button" class="pk${c.w === cur ? ' on' : ''}${used.has(c.w) ? ' used' : ''}${e.sents ? ' spk' : ''}" data-w="${esc(c.w)}">${e.sents ? `<b class="cl">${c.w}</b> ${esc(plain(c.s))}` : esc(c.w)}</button>`).join('')}</div>
+    ${cur ? '<button type="button" class="pk clr" data-w="">✖ Clear</button>' : ''}`;
+  placePop(p, slot.getBoundingClientRect(), e.sents ? 420 : 300);
+  p.onclick = ev => { const b = ev.target.closest('.pk'); if (!b) return; setSlot(q.k, b.dataset.w); hidePop(); };
+}
+// kéo thả bằng pointer (chuột + cảm ứng). Câu A–G trên điện thoại: kéo bằng nút ⠿
+let DRAG = null, dragAt = 0;
+document.addEventListener('pointerdown', ev => {
+  const chip = ev.target.closest('.chip');
+  if (!chip || ev.target.closest('.vw') || !S || !(S.phase === 'work' || S.phase === 'retry')) return;
+  if (chip.classList.contains('schip') && ev.pointerType !== 'mouse' && !ev.target.closest('.grip')) return;
+  DRAG = { chip, id: ev.pointerId, x: ev.clientX, y: ev.clientY, on: false, vy: 0 };
+});
+function dragTick(){
+  if (!DRAG || !DRAG.on) return;
+  if (DRAG.vy) window.scrollBy(0, DRAG.vy);
+  requestAnimationFrame(dragTick);
+}
+document.addEventListener('pointermove', ev => {
+  if (!DRAG || ev.pointerId !== DRAG.id) return;
+  if (!DRAG.on){
+    if (Math.hypot(ev.clientX - DRAG.x, ev.clientY - DRAG.y) < 8) return;
+    DRAG.on = true; hidePop();
+    const g = DRAG.ghost = document.createElement('div');
+    g.className = 'ghost'; g.textContent = DRAG.chip.classList.contains('schip') ? DRAG.chip.dataset.w + ' · ' + plain(DRAG.chip.textContent.replace(/^⠿\s*[A-H]/, '')).slice(0, 40) + '…' : DRAG.chip.dataset.w;
+    document.body.appendChild(g); document.body.classList.add('dragging');
+    requestAnimationFrame(dragTick);
+  }
+  ev.preventDefault();
+  DRAG.ghost.style.left = ev.clientX + 'px'; DRAG.ghost.style.top = ev.clientY + 'px';
+  DRAG.vy = ev.clientY < 80 ? -14 : ev.clientY > window.innerHeight - 80 ? 14 : 0;
+  const over = (document.elementFromPoint(ev.clientX, ev.clientY) || document.body).closest('.slot');
+  $$('.slot.over').forEach(s => { if (s !== over) s.classList.remove('over'); });
+  if (over && !over.disabled && qOf(over.dataset.k).e.id === DRAG.chip.dataset.ex) over.classList.add('over');
+}, { passive: false });
+function dragEnd(ev, drop){
+  if (!DRAG || ev.pointerId !== DRAG.id) return;
+  const d = DRAG; DRAG = null;
+  if (!d.on) return;
+  d.ghost.remove(); document.body.classList.remove('dragging'); dragAt = Date.now();
+  const over = $('.slot.over'); $$('.slot.over').forEach(s => s.classList.remove('over'));
+  if (drop && over){ SEL = null; setSlot(over.dataset.k, d.chip.dataset.w); }
+}
+document.addEventListener('pointerup', ev => dragEnd(ev, true));
+document.addEventListener('pointercancel', ev => dragEnd(ev, false));
 // nút ✓/✗ (ý kiến riêng, không chấm điểm)
 const tickBtns = k => `<span class="tk" data-tk="${k}"><button type="button" class="tkb" data-v="y" aria-label="Important">✓</button><button type="button" class="tkb" data-v="n" aria-label="Not important">✗</button></span>`;
 function exList(e){
@@ -468,12 +571,13 @@ function buildLesson(){
       <div class="card who" id="whoBar"></div>
       <section class="card guide">
         ${allWords.length ? `<h2>📒 New words</h2>
-        <div class="note">✍️ Chép từ mới vào vở nha! Chạm vào từ màu vàng để xem nghĩa.</div>
+        <div class="note">${LESSON.copy === false ? '📖 Học kĩ các từ này trước khi làm bài nha! Chạm vào từ để nghe đọc.' : '✍️ Chép từ mới vào vở nha! Chạm vào từ màu vàng để xem nghĩa.'}</div>
+        ${LESSON.wordsImg ? aiImg(LESSON.wordsImg) : ''}
         <div class="vgrid">${allWords.map(vRow).join('')}</div>
         <div id="afterWords"></div>`
         : `<h2>📘 ${esc(LESSON.title)}</h2>
         <div class="note">💡 Chưa biết từ nào thì chạm vào từ màu vàng để xem nghĩa.</div>`}
-        ${LESSON.grammar ? `<details class="gram"${allWords.length ? '' : ' open'}><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammar}</div></details>` : ''}
+        ${LESSON.grammar ? `<details class="gram" open><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammarImg ? aiImg(LESSON.grammarImg) : ''}${LESSON.grammar}</div></details>` : ''}
       </section>
       ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${
         e.type === 'label' ? exLabel(e) : e.type === 'pics' ? exPics(e) : e.type === 'text' ? exText(e) : e.type === 'speak' ? exSpeak(e) : exList(e)}</section>`).join('')}
@@ -496,6 +600,21 @@ function buildLesson(){
   });
   // chạm lựa chọn
   $('#app').addEventListener('click', ev => {
+    // kéo thả: chạm thẻ từ → chọn; chạm chỗ trống → đặt thẻ đang chọn, hoặc mở bảng chọn
+    const chip = ev.target.closest('.chip');
+    if (chip){
+      if (Date.now() - dragAt < 400 || !(S.phase === 'work' || S.phase === 'retry')) return;
+      SEL = SEL && SEL.ex === chip.dataset.ex && SEL.w === chip.dataset.w ? null : { ex: chip.dataset.ex, w: chip.dataset.w };
+      paintSlots(); return;
+    }
+    const slot = ev.target.closest('.slot');
+    if (slot){
+      if (slot.disabled || Date.now() - dragAt < 400) return;
+      const q = qOf(slot.dataset.k);
+      if (SEL && SEL.ex === q.e.id){ const w = SEL.w; SEL = null; setSlot(q.k, w); }
+      else openPicker(slot);
+      return;
+    }
     // ✓/✗ (không chấm điểm)
     const tb = ev.target.closest('.tkb');
     if (tb && !tb.disabled && S.phase === 'work'){
@@ -648,7 +767,7 @@ function paintChoices(){
 }
 function paintMarks(){
   QS.filter(q => q.tok.kind !== 'ch').forEach(q => {
-    const el = $(`input.txt[data-k="${q.k}"]`); if (!el) return;
+    const el = $(`input.txt[data-k="${q.k}"], .slot[data-k="${q.k}"]`); if (!el) return;
     el.classList.remove('ok', 'bad');
     const sol = el.parentNode.querySelector('.sol'); if (sol) sol.remove();
     if (S.phase === 'work'){ el.disabled = false; el.value = S.a[q.k] || ''; return; }
@@ -679,6 +798,7 @@ function paintMarks(){
     const el = $(`input.txt[data-k="${k}"]`), w = el ? el.parentNode : $(`.ch[data-k="${k}"]`);
     if (w) w.setAttribute('data-n', q.ti + 1);
   });
+  paintSlots();
 }
 // Meme cảm xúc của cô sau lần nộp 1: img/meme/<mức>-<số>.gif. MEMES = số ảnh mỗi mức (thêm ảnh thì tăng số).
 // Chọn ngẫu nhiên, ưu tiên ảnh em chưa gặp ở các bài trước; giữ cố định khi mở lại trang.

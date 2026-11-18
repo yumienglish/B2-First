@@ -3,11 +3,13 @@
    (sách Grammar and Vocabulary for First and First for Schools)
    ---------------------------------------------------------------------
    • OPEN_WEEK: tuần đang mở. LESSONS[tuần] = mảng các bài của tuần (link ?w=tuần&b=số bài), mỗi bài nộp riêng.
-     Mỗi tuần: bài 1 = Grammar (không có ô chép từ, chỉ highlight), bài 2 = Vocabulary.
+     Hiện tại mỗi tuần 1 bài, xen kẽ Grammar / Vocabulary.
+   • copy: false = ô New words chỉ để học (không bắt chép vở). drag: true = kéo thả / chạm từ trong khung vào chỗ trống.
+   • ai / grammarImg / wordsImg = tên hình minh hoạ tạo bằng ChatGPT trong img/ai/<tên>.jpg (chưa có file thì tự ẩn).
      Các bài tuần trước vẫn mở để học sinh xem lại. Cô xem trước bài chưa mở: ?w=2&preview
    • Chữ highlight (bấm xem nghĩa + máy đọc): {{khoá}} hoặc {{khoá|chữ hiển thị}}; khoá phải có trong VOCAB.
    • newWords = ô "New words" (chép vở), CHỈ bài Vocabulary: từ thuộc nội dung chính của bài (B1 trở lên, từ dễ hơn chỉ khi ít gặp).
-     newWordsAfter = từ chính nhưng là đáp án → chỉ hiện trong ô New words sau khi nộp xong. Bài Grammar: newWords = [].
+     newWordsAfter = từ chính nhưng là đáp án → chỉ hiện trong ô New words sau khi nộp xong.
      KHÔNG lấy từ trong câu lệnh đề bài (vẫn highlight), KHÔNG lấy từ là đáp án chưa hiện ra.
      Từ quá hiếm (C2, văn chương) chỉ highlight trong bài.
    • Chỗ làm bài:
@@ -153,11 +155,14 @@ const VOCAB = {
 
 /* ---------- BÀI HỌC THEO TUẦN ---------- */
 const LESSONS = {
-  /* ===================== TUẦN 1 – 2 bài: Grammar Unit 1 (?w=1&b=1) + Vocabulary Unit 25 (?w=1&b=2) ===================== */
+  /* ===================== TUẦN 1 – Grammar Unit 1 ===================== */
   1: [{
     kind: 'Grammar', icon: '📘', code: 'Unit 1', title: 'Present tenses',
-    // Bài ngữ pháp: KHÔNG có ô chép từ mới, chỉ highlight từ khó trong bài
-    newWords: [],
+    // Bài Grammar: có ô New words để HỌC KĨ (copy: false = không bắt chép vở)
+    copy: false,
+    newWords: ['mend', 'odd', 'rude', 'manners', 'bad-tempered', 'in public', 'portions', 'scenery', 'behave', 'manner',
+      'strangers', 'venue', 'rehearse', 'performers', 'appreciate', 'portable'],
+    grammarImg: 'u1-grammar',
     // Ô Grammar: tóm tắt thật ngắn, ví dụ KHÔNG trùng với câu / động từ trong bài tập
     grammar: `
       <h4>1. Hiện tại đơn: V / V-s</h4>
@@ -214,7 +219,7 @@ const LESSONS = {
         ] },
 
       /* Bài 3 (Grammar ex 4) – email, 19 chỗ trống */
-      { id: 'g4', type: 'text',
+      { id: 'g4', type: 'text', ai: 'u1-roadtrip',
         title: 'An email from the USA',
         how: 'Complete the email with the present simple or present continuous form of the verbs in the box.',
         box: ['{{behave}}', 'come', 'cost', 'eat', 'enjoy', 'feel', '~go', 'have', 'like', 'love', 'pay', '{{realise}}', 'say', 'seem', '{{serve}}', 'show', 'smile', 'stay', 'take', 'visit'],
@@ -231,7 +236,7 @@ const LESSONS = {
         ] },
 
       /* Bài 4 – Listening Part 4 (không lấy Grammar focus task) */
-      { id: 'lis4', type: 'list', stack: true, track: 'u1-listening',
+      { id: 'lis4', type: 'list', stack: true, track: 'u1-listening', ai: 'u1-sound-engineer',
         title: 'Listening Part 4: a sound engineer',
         how: 'You will hear an interview with Martin Holloway, a {{sound engineer}}. Choose the best answer (A, B or C).',
         items: [
@@ -252,19 +257,21 @@ const LESSONS = {
         ] },
 
     ],
-  }, {
+  }],
+
+  /* ===================== TUẦN 2 – Vocabulary Unit 25 ===================== */
+  2: [{
     kind: 'Vocabulary', icon: '🌍', code: 'Unit 25', title: 'Earth, sea and sky',
     // Ô chép vở: CHỈ từ thuộc nội dung chính của bài (địa lý, phong cảnh, khí hậu, thời tiết).
     // Từ khó khác trong bài chỉ highlight. newWordsAfter = từ chính là đáp án → chỉ hiện sau khi nộp xong.
-    newWords: [
-      'peaks', 'pine', 'streams', 'vegetation', 'slopes', 'orchards', 'tracks', 'valleys', 'bank', 'springs',
-      'landscape', 'snow-capped', 'fertile', 'shallow', 'narrow', 'winding', 'muddy', 'cultivated', 'flat', 'mountainous',
-      'gentle', 'steep', 'stormy', 'forecast', 'glaciers', 'plains', 'avalanche',
-    ],
-    newWordsAfter: ['trunks', 'sunlight', 'soil', 'roots', 'branches', 'insects', 'frozen', 'misty', 'tropical', 'warmth', 'global'],
+    // ~20 từ chính: 13 hiện sẵn + 7 hiện sau khi nộp xong (là đáp án)
+    newWords: ['peaks', 'slopes', 'valleys', 'streams', 'springs', 'orchards', 'vegetation', 'landscape', 'shallow', 'winding',
+      'cultivated', 'mountainous', 'steep'],
+    newWordsAfter: ['trunks', 'roots', 'branches', 'soil', 'frozen', 'misty', 'tropical'],
+    wordsImg: 'u25-landscape',
     ex: [
       /* Bài 1 (Unit 25 – 1.2) – Manali */
-      { id: 'v12', type: 'text', img: 'u25-manali.jpg',
+      { id: 'v12', type: 'text', drag: true, img: 'u25-manali.jpg',
         only: ['bank', 'orchards', 'pine', 'slopes', 'springs', 'streams', 'tracks', 'valleys', 'vegetation'],
         title: 'Manali, India',
         how: 'Complete the description with the words in the box.',
@@ -277,7 +284,7 @@ const LESSONS = {
         ] },
 
       /* Bài 2 (Unit 25 – 1.3) – nghe: rainforest */
-      { id: 'v13', type: 'text', track: 'u25-rainforest', img: 'u25-rainforest.jpg',
+      { id: 'v13', type: 'text', track: 'u25-rainforest', img: 'u25-rainforest.jpg', ai: 'u25-rainforest',
         title: 'A tropical rainforest',
         how: 'Listen to the description of this photo and complete it with the words you hear.',
         paras: [
@@ -288,7 +295,7 @@ const LESSONS = {
         ] },
 
       /* Bài 3 (Unit 25 – 1.4) – từ trái nghĩa */
-      { id: 'v14', type: 'list',
+      { id: 'v14', type: 'list', drag: true, ai: 'u25-opposites',
         only: ['cultivated', 'mountainous', 'muddy', 'steep', 'straight', 'wide'],
         title: 'Opposites',
         how: 'Match the adjectives with their opposites. Write one word from the box.',
@@ -304,7 +311,7 @@ const LESSONS = {
         ] },
 
       /* Bài 4 (Unit 25 – 3.1) – word building */
-      { id: 'v31', type: 'list',
+      { id: 'v31', type: 'list', ai: 'u25-weather',
         title: 'Word building',
         how: 'Complete the sentences with new words made from the words in the box.',
         box: ['{{freeze}}', '{{globe}}', '{{mist}}', '~storm', '{{tropic}}', 'warm'],
@@ -318,7 +325,7 @@ const LESSONS = {
         ] },
 
       /* Bài 5 – Reading and Use of English Part 6 (không lấy Writing) */
-      { id: 'rue6', type: 'text',
+      { id: 'rue6', type: 'text', drag: true, ai: 'u25-patagonia',
         title: 'Reading Part 6: A trip to Patagonia',
         how: 'Six sentences have been removed from the article. Choose from the sentences A–G the one which fits each gap. There is one extra sentence.',
         tip: 'Đọc cả đoạn, chọn câu khớp với ý <b>cả trước và sau</b> chỗ trống. Chú ý các từ nối và đại từ (it, this, therefore…).',
@@ -334,17 +341,17 @@ const LESSONS = {
         paras: [
           { t: '<b class="ph">A trip to Patagonia</b><br><i>Laura Holt goes in search of {{pumas}}, the large wild cats of South America</i>' },
           { t: 'Taking in a large area of Chile and Argentina, running along the Andes and down to where South America flicks its tail towards Antarctica, is a region called Patagonia and I was there on holiday. It was only my first day in the Torres del Paine National Park, a wild {{portion}} of Chilean Patagonia that’s {{lavished}} with {{towering}} {{glaciers}}, {{snow-clad}} valleys and dramatic peaks.' },
-          { t: 'Some other {{intrepid}} travellers come here to {{tackle}} the {{formidable}} ‘W’ circuit – an extended {{trek}} that links five key points in the national park over several days of {{scrambling}} up and down mountains. ((A/B/*C/D/E/F/G)) I therefore planned to take a more {{leisurely}} pace, in the back of a {{chauffeur-driven}} van.',
+          { t: 'Some other {{intrepid}} travellers come here to {{tackle}} the {{formidable}} ‘W’ circuit – an extended {{trek}} that links five key points in the national park over several days of {{scrambling}} up and down mountains. [[C]] I therefore planned to take a more {{leisurely}} pace, in the back of a {{chauffeur-driven}} van.',
             h: 'Câu trước nói về “other travellers”. Câu sau có “therefore”. Câu trống nói gì về chính tác giả?' },
-          { t: 'We gathered around a fire on the first night at camp. ((A/B/C/D/E/F/*G)) A mother and her {{cubs}} had been {{spot|spotted}} in the valley days before and a lone male had been seen casually {{strolling}} across the camp’s wooden walkways. But by far the most {{startling}} tale was of a young puma cub which had found its way through an unlocked door into a hotel.',
+          { t: 'We gathered around a fire on the first night at camp. [[G]] A mother and her {{cubs}} had been {{spot|spotted}} in the valley days before and a lone male had been seen casually {{strolling}} across the camp’s wooden walkways. But by far the most {{startling}} tale was of a young puma cub which had found its way through an unlocked door into a hotel.',
             h: 'Sau chỗ trống là nhiều câu chuyện người ta kể bên đống lửa. Câu nào giới thiệu những câu chuyện đó?' },
-          { t: 'The next morning, we drove into the Patagonian {{plains}}. Overhead, {{majestic}} {{birds of prey}} carved black shadows against a brilliant blue sky. At Lake Sarmiento, oystercatchers squawked as we approached and elegant ostrich-like rheas pranced past like ballerinas. ((A/*B/C/D/E/F/G)) It was too large to be a grey fox and too small to be a guanaco, the curious llama-like creature that {{roams}} these lands.',
+          { t: 'The next morning, we drove into the Patagonian {{plains}}. Overhead, {{majestic}} {{birds of prey}} carved black shadows against a brilliant blue sky. At Lake Sarmiento, oystercatchers squawked as we approached and elegant ostrich-like rheas pranced past like ballerinas. [[B]] It was too large to be a grey fox and too small to be a guanaco, the curious llama-like creature that {{roams}} these lands.',
             h: 'Câu sau bắt đầu bằng “It was too large…”: “It” là thứ gì vừa xuất hiện trong câu trống?' },
-          { t: '‘Did you see that?’, my guide, Felipe, pointed. ‘Puma?’ I replied. ‘I think so,’ said Felipe. A {{sighting}} of this size was so lucky. Even if it was over in a flash. But I suddenly felt {{vulnerable}}, out there in the {{wilderness}}, with nothing but a stick to defend myself if it came near. ((A/B/C/D/E/*F/G)) Even so, I hoped I wouldn’t have to put the theory to the test.',
+          { t: '‘Did you see that?’, my guide, Felipe, pointed. ‘Puma?’ I replied. ‘I think so,’ said Felipe. A {{sighting}} of this size was so lucky. Even if it was over in a flash. But I suddenly felt {{vulnerable}}, out there in the {{wilderness}}, with nothing but a stick to defend myself if it came near. [[F]] Even so, I hoped I wouldn’t have to put the theory to the test.',
             h: 'Câu sau nhắc đến “the theory” (cách làm theo lý thuyết). Câu trống phải nói ra cách đó.' },
-          { t: 'After a {{hearty}} barbecue beside the Blue Lagoon, it was time to set off again. We {{hurtled}} down unmade mountain roads at {{breakneck}} speed, past the milky green glacial flow of the Paine River. ((*A/B/C/D/E/F/G)) But I was soon back at the camp, {{exhilarated}} and {{utterly}} exhausted.',
+          { t: 'After a {{hearty}} barbecue beside the Blue Lagoon, it was time to set off again. We {{hurtled}} down unmade mountain roads at {{breakneck}} speed, past the milky green glacial flow of the Paine River. [[A]] But I was soon back at the camp, {{exhilarated}} and {{utterly}} exhausted.',
             h: 'Câu trước tả xe lao rất nhanh trên đường núi gồ ghề. Lúc đó tác giả lo điều gì?' },
-          { t: 'Over the next few days, the pace picked up steadily. There was a walk up to the Mirador Cuernos, through silent valleys of {{grazing}} animals, to a startling {{lookout point}}. ((A/B/C/*D/E/F/G)) On the way down, we watched herds of horses {{gallop}} past isolated farms with red corrugated roofs.',
+          { t: 'Over the next few days, the pace picked up steadily. There was a walk up to the Mirador Cuernos, through silent valleys of {{grazing}} animals, to a startling {{lookout point}}. [[D]] On the way down, we watched herds of horses {{gallop}} past isolated farms with red corrugated roofs.',
             h: 'Câu trước tả những thung lũng “silent”. Câu trống tiếp tục ý đó.' },
           { t: 'On the final day I said goodbye and drove out of the park. The closest I had come to seeing a puma may have been a {{fleeting}} {{glimpse}} but I realised it mattered little. For my search had made me study every {{crag}} and cave, bush and {{boulder}} in this vast, ultimately unknowable land all the more intensely.' },
         ] },
