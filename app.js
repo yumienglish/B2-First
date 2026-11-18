@@ -162,6 +162,25 @@ function starsOf(s){
   const p = r.score / r.total;
   return p >= .9 ? 3 : p >= .7 ? 2 : 1;
 }
+/* ============ AVATAR ============ */
+const AVATARS = ['🦊', '🐼', '🐯', '🦁', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🐰', '🐲', '🦖', '🦋', '🐳', '🤖'];
+const avHtml = (av, c = 'av') => /^data:image\//.test(av || '') ? `<img class="${c}" src="${av}" alt="">` : `<span class="${c}">${esc(av || '🙂')}</span>`;
+let AV = '';
+// ảnh trong máy → cắt vuông, thu nhỏ 160px (chỉ lưu trên máy này, không gửi đi)
+function loadAvatarFile(f, done){
+  if (!f || !/^image\//.test(f.type)) return;
+  const r = new FileReader();
+  r.onload = () => { const im = new Image(); im.onload = () => {
+    const s = Math.min(im.width, im.height), c = document.createElement('canvas'); c.width = c.height = 160;
+    c.getContext('2d').drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, 160, 160);
+    done(c.toDataURL('image/jpeg', 0.82)); }; im.src = r.result; };
+  r.readAsDataURL(f);
+}
+function paintAvPick(){
+  $$('#avPick .avb[data-av]').forEach(b => b.classList.toggle('on', b.dataset.av === AV));
+  const up = $('#avUp'); if (up){ up.classList.toggle('on', /^data:/.test(AV)); up.innerHTML = /^data:/.test(AV) ? avHtml(AV, 'avimg') : '📷'; }
+  const pv = $('#avPrev'); if (pv) pv.innerHTML = avHtml(AV, 'av big');
+}
 const starRow = n => [1, 2, 3].map(i => `<span class="${i <= n ? '' : 'off'}">⭐</span>`).join('');
 
 function renderHome(){
@@ -175,7 +194,9 @@ function renderHome(){
   weeks.forEach(w => lessonsOf(w).forEach((L, i) => {
     const n = starsOf(lsGet(storeKey(w, i + 1))); stars += n; if (n){ done++; words += wordsOf(L, true).length; }
   }));
+  const lv = 1 + Math.floor(stars / 6), xp = stars % 6;
   $('#app').innerHTML = `<section class="card hi">
+      ${me.av ? `<div class="hiav">${avHtml(me.av, 'av big')}</div>` : ''}
       <h2>Hi ${first ? esc(first) : 'superstar'}! 🌟</h2>
       <p class="hiline">${hiLine()}</p>
       <div class="stats">
@@ -183,6 +204,7 @@ function renderHome(){
         <div class="stat"><b>📒 ${words}</b><span>new words</span></div>
         <div class="stat"><b>🏁 ${done}</b><span>adventures</span></div>
       </div>
+      <div class="lvl"><span class="lvn">🏆 Level ${lv}</span><div class="lvbar"><i style="width:${Math.round(xp / 6 * 100)}%"></i></div><span class="lvx">⭐ ${xp}/6</span></div>
       ${stars ? '' : '<p class="muted small" style="margin:10px 0 0">Your first stars are waiting for you! ⭐</p>'}
     </section>
     ${weeks.map(w => `<h2 class="part">Week ${w}${w === OPEN_WEEK ? ' · <span class="now">This week</span>' : ''}</h2>` + lessonsOf(w).map((L, i) => {
@@ -192,10 +214,10 @@ function renderHome(){
         : s.phase === 'retry' || s.phase === 'review' ? '<span class="tag warn">✏️ Làm lại câu sai</span>'
         : s.startedAt ? '<span class="tag">⏳ In progress</span>' : '<span class="tag new">🆕 New</span>';
       return `<a class="card lesson" href="?w=${w}&b=${i + 1}">
-        <div class="lnum">${L.icon || w}</div>
+        <div class="lnum k-${esc(String(L.kind).toLowerCase())}">${L.icon || w}</div>
         <div class="linfo"><div class="lt">${esc(L.kind)} · ${esc(L.code)}</div>
           <div class="ln">${esc(L.title)}</div></div>
-        <div>${st}</div></a>`;
+        <div class="lend">${st}${s.phase === 'done' ? '' : '<span class="play">▶</span>'}</div></a>`;
     }).join('')).join('')}
     ${next ? `<div class="card lesson locked"><div class="lnum">🔒</div><div class="linfo"><div class="lt">Week ${OPEN_WEEK + 1}</div><div class="ln">Next adventure unlocks soon!</div></div></div>` : ''}`;
 }
@@ -566,6 +588,9 @@ function buildLesson(){
       <p class="muted" style="margin:0">Điền tên và lớp rồi bấm <b>Start</b>.</p>
       <div class="field"><label for="inName">Full name</label><input id="inName" autocomplete="name" placeholder="e.g. Nguyễn Minh Anh"></div>
       <div class="field"><label for="inCls">Class</label><input id="inCls" placeholder="e.g. B2-01"></div>
+      <div class="field"><label>Choose your avatar</label>
+        <div class="avrow"><div id="avPrev" class="avprev"></div><div class="avpick" id="avPick">${AVATARS.map(x => `<button type="button" class="avb" data-av="${x}">${x}</button>`).join('')}<button type="button" class="avb avup" id="avUp" title="Ảnh trong máy">📷</button><input type="file" id="avFile" accept="image/*" hidden></div></div>
+        <div class="muted small">📷 = chọn ảnh trong máy của em</div></div>
       <div class="err" id="startErr"></div>
       <button class="btn" id="startBtn" type="button">Start →</button>
     </section>
@@ -639,6 +664,10 @@ function buildLesson(){
   });
   const me = lsGet(ME_KEY) || {};
   $('#inName').value = S.name || me.name || ''; $('#inCls').value = S.cls || me.cls || '';
+  AV = me.av || AVATARS[Math.floor(Math.random() * AVATARS.length)]; paintAvPick();
+  $('#avPick').addEventListener('click', ev => { const b = ev.target.closest('.avb'); if (!b) return;
+    if (b.id === 'avUp'){ $('#avFile').click(); return; } AV = b.dataset.av; paintAvPick(); });
+  $('#avFile').addEventListener('change', ev => loadAvatarFile(ev.target.files[0], d => { AV = d; paintAvPick(); }));
   $('#startBtn').addEventListener('click', onStart);
   ['inName', 'inCls'].forEach(id => $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') onStart(); }));
 }
@@ -651,12 +680,12 @@ function onStart(){
   $('#startErr').textContent = '';
   S.name = n.slice(0, 80); S.cls = c.slice(0, 30);
   if (!S.startedAt) S.startedAt = new Date().toISOString();
-  save(); lsSet(ME_KEY, { name: S.name, cls: S.cls });
+  save(); lsSet(ME_KEY, { name: S.name, cls: S.cls, av: AV });
   showWork(); window.scrollTo({ top: 0 });
 }
 function renderWho(){
   const when = S.phase === 'done' ? (S.r2 || S.r1).at : null;
-  $('#whoBar').innerHTML = `<span>👤 <b>${esc(S.name)}</b> · Class <b>${esc(S.cls)}</b></span>` +
+  $('#whoBar').innerHTML = `<span class="whoname">${avHtml(AV || (lsGet(ME_KEY) || {}).av)} <b>${esc(S.name)}</b> · Class <b>${esc(S.cls)}</b></span>` +
     (when ? `<span class="muted small">Submitted ${new Date(when).toLocaleString('vi-VN')}</span>`
       : S.phase === 'work' ? '<button class="linkbtn" type="button" id="editName">Sửa tên / lớp</button>' : '');
   const b = $('#editName'); if (b) b.onclick = () => { $('#work').hidden = true; $('#bar').hidden = true; $('#start').hidden = false; $('#inName').focus(); };

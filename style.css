@@ -369,3 +369,56 @@ main{position:relative;z-index:1}
   .itpic{width:82px}
   .it.haspic{line-height:1.9;gap:8px}
 }
+
+/* ===== Giao diện kiểu game, màu tươi sáng ===== */
+body{background:
+  radial-gradient(circle at 8% 12%,rgba(255,214,102,.35) 0 90px,transparent 91px),
+  radial-gradient(circle at 92% 30%,rgba(140,220,255,.35) 0 120px,transparent 121px),
+  radial-gradient(circle at 15% 70%,rgba(180,240,190,.35) 0 110px,transparent 111px),
+  radial-gradient(circle at 88% 85%,rgba(255,170,200,.3) 0 100px,transparent 101px),
+  linear-gradient(180deg,#e3f9ff 0%,#effff3 50%,#fff7e3 100%) fixed}
+.hero{background:linear-gradient(120deg,#12c2c4 0%,#28a7f0 48%,#8f6cf6 100%);position:relative;overflow:hidden}
+.hero::before,.hero::after{content:"✦";position:absolute;color:rgba(255,255,255,.55);font-size:46px;top:10px;left:8%;animation:twk 2.4s infinite}
+.hero::after{content:"★";font-size:34px;top:auto;bottom:34px;left:auto;right:9%;animation-delay:1.2s}
+@keyframes twk{50%{opacity:.25;transform:scale(.8) rotate(20deg)}}
+.hero h1{text-shadow:0 3px 0 rgba(0,0,0,.15)}
+.card{border:2px solid #fff;box-shadow:0 6px 0 rgba(20,90,120,.08),0 8px 22px rgba(20,60,90,.08)}
+.btn{border-radius:14px;box-shadow:0 4px 0 var(--brand-dark)}
+.btn.orange{background:linear-gradient(180deg,#ffa057,#ff7a2e);box-shadow:0 4px 0 #c9561a}
+.badge{background:linear-gradient(90deg,#ff7a2e,#ff4f8b)}
+.hi{background:linear-gradient(180deg,#fff,#fff9ec)}
+.hi h2{color:#5a3fd6}
+.stat:nth-child(1){background:#fff3c4} .stat:nth-child(2){background:#dff7e6} .stat:nth-child(3){background:#ece6ff}
+.lvl{display:flex;align-items:center;gap:10px;max-width:470px;margin:14px auto 0;font-weight:800}
+.lvn{color:#d0631a;white-space:nowrap}
+.lvbar{flex:1;height:14px;border-radius:99px;background:#eee6d6;overflow:hidden;box-shadow:inset 0 2px 3px rgba(0,0,0,.1)}
+.lvbar i{display:block;height:100%;min-width:8px;border-radius:99px;background:linear-gradient(90deg,#ffd23f,#ff8a3d)}
+.lvx{font-size:14px;color:var(--muted);white-space:nowrap}
+.lesson{border:2px solid #fff}
+.lesson:hover{transform:translateY(-3px) scale(1.01)}
+.lesson .lnum{font-size:28px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.lesson .lnum.k-grammar{background:linear-gradient(135deg,#ff9a3d,#ff4f8b)}
+.lesson .lnum.k-vocabulary{background:linear-gradient(135deg,#2bd47d,#12a8c4)}
+.lend{display:flex;align-items:center;gap:10px}
+.play{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#ffa057,#ff7a2e);color:#fff;font-size:18px;box-shadow:0 4px 0 #c9561a;padding-left:3px}
+.part{color:#5a3fd6}
+
+/* ===== Avatar ===== */
+.av{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#fff3c4;font-size:22px;object-fit:cover;vertical-align:middle;box-shadow:0 0 0 2px #fff,0 0 0 4px #ffd23f}
+.av.big{width:76px;height:76px;font-size:48px}
+.hiav{margin:-4px 0 6px}
+.whoname{display:inline-flex;align-items:center;gap:8px}
+.avrow{display:flex;gap:14px;align-items:center}
+.avprev{flex:none}
+.avpick{display:flex;flex-wrap:wrap;gap:6px}
+.avb{font:inherit;font-size:26px;width:48px;height:48px;border-radius:14px;border:2.5px solid var(--line);background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;overflow:hidden}
+.avb.on{border-color:#ff8a3d;background:#fff0e0;transform:scale(1.08);box-shadow:0 3px 0 #ffb27a}
+.avb .avimg{width:100%;height:100%;object-fit:cover}
+@media (max-width:520px){.avrow{flex-direction:column;align-items:flex-start}.avb{width:42px;height:42px;font-size:23px}}
+
+/* bài có hình cạnh câu + khung từ bên cạnh: điện thoại → hình trên, câu dưới */
+@media (max-width:700px){
+  .dz .it.haspic{flex-wrap:wrap}
+  .dz .it.haspic .itb{flex-basis:100%}
+  .dz .itpic{width:110px}
+}

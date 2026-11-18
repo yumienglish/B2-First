@@ -311,7 +311,7 @@ const LESSONS = {
         ] },
 
       /* Bài 4 (Unit 25 – 3.1) – word building */
-      { id: 'v31', type: 'list', pics: [0, 1, 2, 3, 4, 5].map(i => 'u25-weather-' + i),
+      { id: 'v31', type: 'list', side: true, pics: [0, 1, 2, 3, 4, 5].map(i => 'u25-weather-' + i),
         title: 'Word building',
         how: 'Complete the sentences with new words made from the words in the box.',
         box: ['{{freeze}}', '{{globe}}', '{{mist}}', '~storm', '{{tropic}}', 'warm'],
