@@ -186,14 +186,9 @@ const starRow = n => [1, 2, 3].map(i => `<span class="${i <= n ? '' : 'off'}">�
 function renderHome(){
   document.title = 'B2 First Adventure 🚀';
   $('#heroSub').textContent = 'Explore · Practise · Level up · Shine ✨';
-  const weeks = Object.keys(LESSONS).map(Number).filter(w => w <= OPEN_WEEK).sort((a, b) => b - a);
-  const next = LESSONS[OPEN_WEEK + 1];
   const me = lsGet(ME_KEY) || {};
   const first = String(me.name || '').trim().split(/\s+/).pop();
-  let stars = 0, words = 0, done = 0;
-  weeks.forEach(w => lessonsOf(w).forEach((L, i) => {
-    const n = starsOf(lsGet(storeKey(w, i + 1))); stars += n; if (n){ done++; words += wordsOf(L, true).length; }
-  }));
+  const d = gameData(), { stars, words, done } = d; // fun.js
   const lv = 1 + Math.floor(stars / 6), xp = stars % 6;
   $('#app').innerHTML = `<section class="card hi">
       ${me.av ? `<div class="hiav">${avHtml(me.av, 'av big')}</div>` : ''}
@@ -207,19 +202,10 @@ function renderHome(){
       <div class="lvl"><span class="lvn">🏆 Level ${lv}</span><div class="lvbar"><i style="width:${Math.round(xp / 6 * 100)}%"></i></div><span class="lvx">⭐ ${xp}/6</span></div>
       ${stars ? '' : '<p class="muted small" style="margin:10px 0 0">Your first stars are waiting for you! ⭐</p>'}
     </section>
-    ${weeks.map(w => `<h2 class="part">Week ${w}${w === OPEN_WEEK ? ' · <span class="now">This week</span>' : ''}</h2>` + lessonsOf(w).map((L, i) => {
-      const s = lsGet(storeKey(w, i + 1)) || {};
-      const r = s.r2 || s.r1;
-      const st = s.phase === 'done' ? `<span class="tag ok stars">${starRow(starsOf(s))}${r ? ' ' + r.score + '/' + r.total : ''}</span>`
-        : s.phase === 'retry' || s.phase === 'review' ? '<span class="tag warn">✏️ Làm lại câu sai</span>'
-        : s.startedAt ? '<span class="tag">⏳ In progress</span>' : '<span class="tag new">🆕 New</span>';
-      return `<a class="card lesson" href="?w=${w}&b=${i + 1}">
-        <div class="lnum k-${esc(String(L.kind).toLowerCase())}">${L.icon || w}</div>
-        <div class="linfo"><div class="lt">${esc(L.kind)} · ${esc(L.code)}</div>
-          <div class="ln">${esc(L.title)}</div></div>
-        <div class="lend">${st}${s.phase === 'done' ? '' : '<span class="play">▶</span>'}</div></a>`;
-    }).join('')).join('')}
-    ${next ? `<div class="card lesson locked"><div class="lnum">🔒</div><div class="linfo"><div class="lt">Week ${OPEN_WEEK + 1}</div><div class="ln">Next adventure unlocks soon!</div></div></div>` : ''}`;
+    ${reviewCard(d)}
+    ${mapHtml(d)}
+    ${badgesHtml(d)}`;
+  afterHome();
 }
 
 /* ============ DANH SÁCH CÂU HỎI ============ */
@@ -476,6 +462,7 @@ function setSlot(k, v){
   S.a[k] = v || '';
   const el = $(`.slot[data-k="${k}"]`); if (el) el.classList.remove('bad', 'ok');
   save(); paintSlots(); progress(); if (S.phase === 'retry') topProgress();
+  if (v && el){ sfx('pop'); el.classList.remove('popin'); void el.offsetWidth; el.classList.add('popin'); }
 }
 // chạm vào chỗ trống (chưa chọn thẻ) → bảng chọn
 function openPicker(slot){
@@ -660,7 +647,7 @@ function buildLesson(){
     if (q.tok.need <= 1) cur = cur[0] === i ? [] : [i];
     else if (cur.includes(i)) cur = cur.filter(x => x !== i);
     else { cur.push(i); if (cur.length > q.tok.need) cur.shift(); }
-    S.a[k] = cur; save(); paintChoices(); progress(); if (S.phase === 'retry') topProgress();
+    S.a[k] = cur; save(); paintChoices(); sfx("tick"); progress(); if (S.phase === 'retry') topProgress();
   });
   const me = lsGet(ME_KEY) || {};
   $('#inName').value = S.name || me.name || ''; $('#inCls').value = S.cls || me.cls || '';
@@ -892,7 +879,7 @@ async function onSubmit(){
     S.sid = makeSid();
     S.phase = g.score === g.total ? 'done' : 'review';
     save(); paintAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
-    send();
+    send(); afterSubmit();
     return;
   }
   if (S.phase === 'retry'){
@@ -905,7 +892,7 @@ async function onSubmit(){
     const ks = Object.keys(g.items);
     S.r2 = { at: new Date().toISOString(), leaves: S.leaves || 0, score: ks.filter(k => g.items[k].ok).length, total: ks.length, items: g.items };
     S.phase = 'done'; save(); paintAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
-    send();
+    send(); afterSubmit();
   }
 }
 
@@ -1011,7 +998,7 @@ window.addEventListener('blur', goAway);
 window.addEventListener('focus', comeBack);
 
 /* ============ KHỞI ĐỘNG ============ */
-(function boot(){
+function boot(){
   if (!LESSON){
     $('#bar').hidden = true;
     if (WEEK_NO) { $('#app').innerHTML = '<div class="card">🔒 Bài này chưa mở. <a href="./">← Quay lại danh sách bài</a></div>'; return; }
@@ -1024,4 +1011,5 @@ window.addEventListener('focus', comeBack);
   if (S.startedAt && S.name) showWork();
   paintAll();
   if (S.r1 && (!S.sent1 || (S.r2 && !S.sent2))) send(); // lần trước chưa gửi được → gửi lại
-})();
+}
+document.addEventListener("DOMContentLoaded", boot); // chờ fun.js nạp xong

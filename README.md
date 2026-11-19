@@ -8,6 +8,7 @@ Link cho học sinh: https://yumienglish.github.io/B2-First/
 - `index.html`: trang chủ (danh sách bài) và trang bài làm (`?w=1&b=1`, `?w=2&b=1`…). Hiện mỗi tuần 1 bài, xen kẽ Grammar / Vocabulary. Cô xem trước bài chưa mở: `?w=2&b=1&preview`
 - `lessons.js`: **dữ liệu bài học**: `OPEN_WEEK`, `VOCAB` (từ mới: nghĩa, phiên âm), `LESSONS` (đề, đáp án, gợi ý, ô Grammar)
 - `app.js`: giao diện, chấm điểm, làm lại câu sai, gửi bài
+- `fun.js`: phần game: bản đồ phiêu lưu (trang chủ), huy hiệu, Quick review (ôn 10 từ / 60 giây, mỗi ngày tính sao 3 lượt đầu), âm thanh (nút 🔊), pháo hoa khi đạt 100%
 - `img/`: ảnh cắt từ sách, `img/meme/`: meme cảm xúc của cô sau lần nộp 1, `img/ai/`: hình minh hoạ tạo bằng ChatGPT (jpg, đã nén)
 - `ai-images/PROMPTS.md`: prompt để cô tạo hình trong ChatGPT; ảnh gốc cô lưu vào `ai-images/` (không đưa lên git)
 - `audio/`: audio đã cắt sẵn (bỏ phần giới thiệu Unit / số bài / đề bài, chỉ giữ từ đoạn nội dung đầu tiên)
