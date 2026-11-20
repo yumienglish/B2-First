@@ -163,8 +163,9 @@ function starsOf(s){
   return p >= .9 ? 3 : p >= .7 ? 2 : 1;
 }
 /* ============ AVATAR ============ */
-const AVATARS = ['🦊', '🐼', '🐯', '🦁', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🐰', '🐲', '🦖', '🦋', '🐳', '🤖'];
-const avHtml = (av, c = 'av') => /^data:image\//.test(av || '') ? `<img class="${c}" src="${av}" alt="">` : `<span class="${c}">${esc(av || '🙂')}</span>`;
+const AVATARS = Array.from({ length: 16 }, (_, i) => 'a' + (i + 1)); // img/ui/av-1…16.webp
+const avHtml = (av, c = 'av') => /^data:image\//.test(av || '') ? `<img class="${c}" src="${av}" alt="">`
+  : /^a\d+$/.test(av || '') ? `<img class="${c}" src="img/ui/av-${av.slice(1)}.webp" alt="">` : `<span class="${c}">${esc(av || '🙂')}</span>`;
 let AV = '';
 // ảnh trong máy → cắt vuông, thu nhỏ 160px (chỉ lưu trên máy này, không gửi đi)
 function loadAvatarFile(f, done){
@@ -191,6 +192,7 @@ function renderHome(){
   const d = gameData(), { stars, words, done } = d; // fun.js
   const lv = 1 + Math.floor(stars / 6), xp = stars % 6;
   $('#app').innerHTML = `<section class="card hi">
+      <img class="hmas" src="img/ui/mascot-1.webp" alt="">
       ${me.av ? `<div class="hiav">${avHtml(me.av, 'av big')}</div>` : ''}
       <h2>Hi ${first ? esc(first) : 'superstar'}! 🌟</h2>
       <p class="hiline">${hiLine()}</p>
@@ -576,7 +578,7 @@ function buildLesson(){
       <div class="field"><label for="inName">Full name</label><input id="inName" autocomplete="name" placeholder="e.g. Nguyễn Minh Anh"></div>
       <div class="field"><label for="inCls">Class</label><input id="inCls" placeholder="e.g. B2-01"></div>
       <div class="field"><label>Choose your avatar</label>
-        <div class="avrow"><div id="avPrev" class="avprev"></div><div class="avpick" id="avPick">${AVATARS.map(x => `<button type="button" class="avb" data-av="${x}">${x}</button>`).join('')}<button type="button" class="avb avup" id="avUp" title="Ảnh trong máy">📷</button><input type="file" id="avFile" accept="image/*" hidden></div></div>
+        <div class="avrow"><div id="avPrev" class="avprev"></div><div class="avpick" id="avPick">${AVATARS.map(x => `<button type="button" class="avb" data-av="${x}">${avHtml(x, 'avimg')}</button>`).join('')}<button type="button" class="avb avup" id="avUp" title="Ảnh trong máy">📷</button><input type="file" id="avFile" accept="image/*" hidden></div></div>
         <div class="muted small">📷 = chọn ảnh trong máy của em</div></div>
       <div class="err" id="startErr"></div>
       <button class="btn" id="startBtn" type="button">Start →</button>
@@ -873,7 +875,7 @@ const RESET_CODE = 'yumi-lamlai';
 const modalOpen = () => { const m = $('#modal'); return !!m && !m.hidden; };
 // Hộp xác nhận trên trang (thay confirm của trình duyệt). yes = nút phụ (Nộp), no = nút chính (Làm tiếp). Không có yes = chỉ thông báo.
 function modal(msg, yes, no){
-  if (!$('#modal')) document.body.insertAdjacentHTML('beforeend', '<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true"><div class="mmsg" id="mMsg"></div><div class="mbtns"><button class="btn ghost" type="button" id="mYes"></button><button class="btn" type="button" id="mNo"></button></div></div></div>');
+  if (!$('#modal')) document.body.insertAdjacentHTML('beforeend', '<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true"><div class="mmsg" id="mMsg"></div><div class="mbtns"><button class="btn lite" type="button" id="mYes"></button><button class="btn" type="button" id="mNo"></button></div></div></div>');
   return new Promise(res => {
     const m = $('#modal'), y = $('#mYes'), n = $('#mNo');
     $('#mMsg').innerHTML = msg;

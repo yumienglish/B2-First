@@ -81,22 +81,23 @@ function gameData(){
 
 /* ---------- Huy hiệu ---------- */
 const BADGES = [
-  { id: 'first', icon: '🗺️', name: 'Explorer', vi: 'Làm xong bài đầu tiên', test: d => d.done >= 1 },
-  { id: 'focus', icon: '🎯', name: 'Super Focus', vi: 'Làm xong 1 bài mà không rời trang lần nào',
+  { id: 'first', img: 1, icon: '🗺️', name: 'Explorer', vi: 'Làm xong bài đầu tiên', test: d => d.done >= 1 },
+  { id: 'focus', img: 2, icon: '🎯', name: 'Super Focus', vi: 'Làm xong 1 bài mà không rời trang lần nào',
     test: d => d.states.some(x => x.s.phase === 'done' && x.s.r1 && !x.s.r1.leaves && (!x.s.r2 || x.s.r2.leaves === x.s.r1.leaves)) },
-  { id: 'perfect', icon: '💯', name: 'Perfect!', vi: 'Đúng hết ngay lần nộp đầu', test: d => d.states.some(x => x.s.r1 && x.s.r1.total && x.s.r1.score === x.s.r1.total) },
-  { id: 'never', icon: '🔁', name: 'Never Give Up', vi: 'Làm lại câu sai và sửa đúng hết', test: d => d.states.some(x => x.s.r2 && x.s.r2.score === x.s.r2.total) },
-  { id: 'quick', icon: '⚡', name: 'Quick Thinker', vi: 'Đạt 10/10 trong Quick review', test: d => d.rev.best >= 10 },
-  { id: 'streak', icon: '🔥', name: '3-Week Streak', vi: 'Làm xong bài 3 tuần liên tiếp', test: d => d.maxStreak >= 3 },
-  { id: 'stars', icon: '🌟', name: 'Star Collector', vi: 'Có 15 sao', test: d => d.stars >= 15 },
-  { id: 'words', icon: '📚', name: 'Word Hunter', vi: 'Học được 60 từ mới', test: d => d.words >= 60 },
+  { id: 'perfect', img: 3, icon: '💯', name: 'Perfect!', vi: 'Đúng hết ngay lần nộp đầu', test: d => d.states.some(x => x.s.r1 && x.s.r1.total && x.s.r1.score === x.s.r1.total) },
+  { id: 'never', img: 4, icon: '🔁', name: 'Never Give Up', vi: 'Làm lại câu sai và sửa đúng hết', test: d => d.states.some(x => x.s.r2 && x.s.r2.score === x.s.r2.total) },
+  { id: 'quick', img: 5, icon: '⚡', name: 'Quick Thinker', vi: 'Đạt 10/10 trong Quick review', test: d => d.rev.best >= 10 },
+  { id: 'streak', img: 6, icon: '🔥', name: '3-Week Streak', vi: 'Làm xong bài 3 tuần liên tiếp', test: d => d.maxStreak >= 3 },
+  { id: 'stars', img: 7, icon: '🌟', name: 'Star Collector', vi: 'Có 15 sao', test: d => d.stars >= 15 },
+  { id: 'words', img: 8, icon: '📚', name: 'Word Hunter', vi: 'Học được 60 từ mới', test: d => d.words >= 60 },
 ];
+const badgeImg = b => `<img class="bi" src="img/ui/badge-${b.img}.webp" alt="${b.icon}">`;
 const earnedBadges = d => BADGES.filter(b => b.test(d)).map(b => b.id);
 function badgesHtml(d){
   const got = earnedBadges(d);
   return `<section class="card badges"><h2>🏅 My badges <span class="bcount">${got.length}/${BADGES.length}</span></h2>
     <div class="bgrid">${BADGES.map(b => { const on = got.includes(b.id);
-      return `<div class="bdg${on ? ' on' : ''}"><span class="bi">${on ? b.icon : '🔒'}</span><b>${b.name}</b><small>${b.vi}</small></div>`; }).join('')}</div></section>`;
+      return `<div class="bdg${on ? ' on' : ''}"><span class="bwrap">${badgeImg(b)}${on ? '' : '<i class="block">🔒</i>'}</span><b>${b.name}</b><small>${b.vi}</small></div>`; }).join('')}</div></section>`;
 }
 // huy hiệu mới → màn chúc mừng
 function checkBadges(){
@@ -105,8 +106,8 @@ function checkBadges(){
   if (!fresh.length) return;
   lsSet(BADGE_KEY, seen.concat(fresh));
   const ov = document.createElement('div'); ov.className = 'fxov';
-  ov.innerHTML = `<div class="fxcard"><div class="fxt">🏅 New badge${fresh.length > 1 ? 's' : ''}!</div>
-    ${fresh.map(id => { const b = BADGES.find(x => x.id === id); return `<div class="fxb"><span class="bi">${b.icon}</span><div><b>${b.name}</b><small>${b.vi}</small></div></div>`; }).join('')}
+  ov.innerHTML = `<div class="fxcard"><img class="fxmas" src="img/ui/mascot-2.webp" alt=""><div class="fxt">🏅 New badge${fresh.length > 1 ? 's' : ''}!</div>
+    ${fresh.map(id => { const b = BADGES.find(x => x.id === id); return `<div class="fxb">${badgeImg(b)}<div><b>${b.name}</b><small>${b.vi}</small></div></div>`; }).join('')}
     <button class="btn orange" type="button">Yay! 🎉</button></div>`;
   ov.addEventListener('click', ev => { if (ev.target === ov || ev.target.closest('button')) ov.remove(); });
   document.body.appendChild(ov); confetti(110); sfx('badge');
@@ -124,9 +125,9 @@ function mapHtml(d){
   rows.push({ exam: true });
   return `<section class="map" id="map"><h2 class="maph">🗺️ Your adventure map</h2><svg class="mpath" id="mpath" aria-hidden="true"></svg>
     ${rows.map((r, i) => {
-      const z = ZONES[i % ZONES.length], X = XS[i % XS.length], deco = `<span class="deco" style="left:${X === 50 ? (i % 4 === 0 ? 84 : 16) : 100 - X}%">${z[0]}<i>${z[1]}</i></span>`;
-      if (r.exam) return `<div class="mrow">${deco}<div class="st lock exam" style="left:${X}%"><span class="node">🏰</span><span class="slab"><b>Final stop</b><span>B2 First exam 🎓</span></span></div></div>`;
-      if (r.lock) return `<div class="mrow">${deco}<div class="st lock" style="left:${X}%"><span class="node">🔒</span><span class="slab"><b>Week ${r.lock}</b><span>Unlocks soon!</span></span></div></div>`;
+      const z = ZONES[i % ZONES.length], X = XS[i % XS.length], deco = `<img class="deco" src="img/ui/isle-${(i % 8) + 1}.webp" alt="" style="left:${X === 50 ? (i % 4 === 0 ? 82 : 18) : 100 - X}%">`;
+      if (r.exam) return `<div class="mrow">${deco}<div class="st lock exam" style="left:${X}%"><span class="node"><img src="img/ui/node-4.webp" alt=""></span><span class="slab"><b>Final stop</b><span>B2 First exam 🎓</span></span></div></div>`;
+      if (r.lock) return `<div class="mrow">${deco}<div class="st lock" style="left:${X}%"><span class="node"><img src="img/ui/node-3.webp" alt=""></span><span class="slab"><b>Week ${r.lock}</b><span>Unlocks soon!</span></span></div></div>`;
       const { w, b, L, s } = r.x, res = s.r2 || s.r1;
       const tag = s.phase === 'done' ? `<span class="sst">${starRow(starsOf(s))}${res ? ' ' + res.score + '/' + res.total : ''}</span>`
         : s.phase === 'retry' || s.phase === 'review' ? '<span class="sst warn">✏️ Làm lại câu sai</span>'
@@ -134,7 +135,7 @@ function mapHtml(d){
       const isHere = here === r.x;
       return `<div class="mrow">${deco}<a class="st${s.phase === 'done' ? ' done' : ''}${cur === r.x ? ' cur' : ''}" style="left:${X}%" href="?w=${w}&b=${b}">
         ${isHere ? `<span class="me">${avHtml(me.av || AVATARS[0], 'av')}</span>` : ''}
-        <span class="node k-${esc(String(L.kind).toLowerCase())}">${L.icon || '⭐'}${cur === r.x ? '<em class="go">▶ Play</em>' : ''}</span>
+        <span class="node k-${esc(String(L.kind).toLowerCase())}"><img src="img/ui/node-${/vocab/i.test(L.kind) ? 2 : 1}.webp" alt="${esc(L.icon || '')}">${cur === r.x ? '<em class="go">▶ Play</em>' : ''}</span>
         <span class="slab"><b>Week ${w} · ${esc(L.kind)}</b><span>${esc(L.title)}</span>${tag}</span></a></div>`;
     }).join('')}</section>`;
 }
@@ -156,7 +157,7 @@ window.addEventListener('resize', () => { if (!LESSON) drawMap(); });
 /* ---------- Quick review: 10 từ / 60 giây ---------- */
 function reviewCard(d){
   const ok = d.pool.length >= 4;
-  return `<section class="card qr${ok ? '' : ' off'}"><div class="qri">⚡</div>
+  return `<section class="card qr${ok ? '' : ' off'}"><img class="qri" src="img/ui/qr-1.webp" alt="⚡">
     <div class="qrt"><b>Quick review</b><span>${ok ? `${Math.min(10, d.pool.length)} words · 60 seconds · win up to ⭐⭐⭐` : 'Làm xong 1 bài để mở khoá trò chơi ôn từ!'}</span>
     ${d.rev.plays ? `<small>Best: ${d.rev.best}/10 · Played ${d.rev.plays}×</small>` : ''}</div>
     <button class="btn orange" id="qrBtn" type="button"${ok ? '' : ' disabled'}>Play ▶</button></section>`;
@@ -212,11 +213,11 @@ function startReview(){
     const t = today(), n = r.days[t] || 0, gain = n < 3 ? st : 0; // mỗi ngày tính sao 3 lượt đầu
     r.plays++; r.best = Math.max(r.best, Q.length >= 10 ? G.score : 0); r.stars += gain; r.days = { [t]: n + 1 };
     lsSet(REV_KEY, r);
-    body.innerHTML = `<div class="gend"><div class="gbig">${G.score} / ${Q.length}</div>
+    body.innerHTML = `<div class="gend"><img class="gmas" src="img/ui/mascot-${st >= 2 ? 2 : 3}.webp" alt=""><div class="gbig">${G.score} / ${Q.length}</div>
       <div class="gst">${[1, 2, 3].map(i => `<span class="${i <= st ? '' : 'off'}">⭐</span>`).join('')}</div>
       <p>${G.score === Q.length ? 'Amazing! You know them all! 🏆' : G.score >= Q.length * .7 ? 'Great job! Keep it up! 💪' : 'Good try! Play again to remember more. 🌱'}</p>
       <p class="muted small">${gain ? `+${gain} ⭐ added to your stars` : st ? 'Hôm nay em đã nhận đủ sao ôn từ (3 lượt). Vẫn chơi tiếp để nhớ từ nhé!' : ''}</p>
-      <div class="gbtns"><button class="btn" type="button" id="gAgain">Play again 🔁</button><button class="btn ghost" type="button" id="gClose">Close</button></div></div>`;
+      <div class="gbtns"><button class="btn" type="button" id="gAgain">Play again 🔁</button><button class="btn lite" type="button" id="gClose">Close</button></div></div>`;
     if (st === 3){ confetti(); sfx('win'); } else sfx('ok');
     body.querySelector('#gAgain').onclick = () => { clearInterval(G.timer); ov.remove(); document.removeEventListener('keydown', onKey); startReview(); };
     body.querySelector('#gClose').onclick = close;
