@@ -42,7 +42,7 @@ function confetti(n){
   const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   n = reduce ? 30 : (n || 150);
   const box = document.createElement('div'); box.className = 'confetti';
-  const C = ['#ff4f8b', '#ffd23f', '#2bd47d', '#28a7f0', '#8f6cf6', '#ff8a3d'];
+  const C = ['#22e3ff', '#ff2e88', '#b6ff3b', '#ffc83d', '#8f6cf6', '#ffffff'];
   for (let i = 0; i < n; i++){
     const p = document.createElement('i');
     p.style.left = Math.random() * 100 + 'vw'; p.style.background = C[i % C.length];
@@ -79,6 +79,21 @@ function gameData(){
   return { weeks, states, rev, lessonStars, stars, words, done, maxStreak, pool };
 }
 
+/* ---------- Rank (theo tổng sao) ---------- */
+const RANKS = [
+  { n: 'Bronze', min: 0, e: '🥉' }, { n: 'Silver', min: 6, e: '🥈' }, { n: 'Gold', min: 15, e: '🥇' },
+  { n: 'Platinum', min: 27, e: '💠' }, { n: 'Diamond', min: 42, e: '💎' }, { n: 'Master', min: 60, e: '👑' },
+];
+function rankHtml(stars){
+  let i = 0; RANKS.forEach((r, j) => { if (stars >= r.min) i = j; });
+  const r = RANKS[i], nx = RANKS[i + 1];
+  const pct = nx ? Math.round((stars - r.min) / (nx.min - r.min) * 100) : 100;
+  return `<div class="rank"><img class="rkimg" src="img/ui/rank-${i + 1}.webp" alt="${r.e}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'rkemo',textContent:'${r.e}'}))">
+    <div class="rkinfo"><div class="rkname">${r.n} <small>RANK</small></div>
+      <div class="lvbar"><i style="width:${pct}%"></i></div>
+      <div class="rkx">${nx ? `⭐ ${stars}/${nx.min} to <b>${nx.n}</b>` : '⭐ ' + stars + ' · Top rank! 👑'}</div></div></div>`;
+}
+
 /* ---------- Huy hiệu ---------- */
 const BADGES = [
   { id: 'first', img: 1, icon: '🗺️', name: 'Explorer', vi: 'Làm xong bài đầu tiên', test: d => d.done >= 1 },
@@ -95,7 +110,7 @@ const badgeImg = b => `<img class="bi" src="img/ui/badge-${b.img}.webp" alt="${b
 const earnedBadges = d => BADGES.filter(b => b.test(d)).map(b => b.id);
 function badgesHtml(d){
   const got = earnedBadges(d);
-  return `<section class="card badges"><h2>🏅 My badges <span class="bcount">${got.length}/${BADGES.length}</span></h2>
+  return `<section class="card badges"><h2>🏆 Achievements <span class="bcount">${got.length}/${BADGES.length}</span></h2>
     <div class="bgrid">${BADGES.map(b => { const on = got.includes(b.id);
       return `<div class="bdg${on ? ' on' : ''}"><span class="bwrap">${badgeImg(b)}${on ? '' : '<i class="block">🔒</i>'}</span><b>${b.name}</b><small>${b.vi}</small></div>`; }).join('')}</div></section>`;
 }
@@ -123,11 +138,11 @@ function mapHtml(d){
   const rows = d.states.map(x => ({ x }));
   if (LESSONS[OPEN_WEEK + 1]) rows.push({ lock: OPEN_WEEK + 1 });
   rows.push({ exam: true });
-  return `<section class="map" id="map"><h2 class="maph">🗺️ Your adventure map</h2><svg class="mpath" id="mpath" aria-hidden="true"></svg>
+  return `<section class="map" id="map"><h2 class="maph">🎮 Season map</h2><svg class="mpath" id="mpath" aria-hidden="true"></svg>
     ${rows.map((r, i) => {
-      const z = ZONES[i % ZONES.length], X = XS[i % XS.length], deco = `<img class="deco" src="img/ui/isle-${(i % 8) + 1}.webp" alt="" style="left:${X === 50 ? (i % 4 === 0 ? 82 : 18) : 100 - X}%">`;
-      if (r.exam) return `<div class="mrow">${deco}<div class="st lock exam" style="left:${X}%"><span class="node"><img src="img/ui/node-4.webp" alt=""></span><span class="slab"><b>Final stop</b><span>B2 First exam 🎓</span></span></div></div>`;
-      if (r.lock) return `<div class="mrow">${deco}<div class="st lock" style="left:${X}%"><span class="node"><img src="img/ui/node-3.webp" alt=""></span><span class="slab"><b>Week ${r.lock}</b><span>Unlocks soon!</span></span></div></div>`;
+      const z = ZONES[i % ZONES.length], X = XS[i % XS.length], deco = '';
+      if (r.exam) return `<div class="mrow">${deco}<div class="st lock exam" style="left:${X}%"><span class="node"><img src="img/ui/node-4.webp" alt=""></span><span class="slab"><b>FINAL BOSS</b><span>B2 First exam 🎓</span></span></div></div>`;
+      if (r.lock) return `<div class="mrow">${deco}<div class="st lock" style="left:${X}%"><span class="node"><img src="img/ui/node-3.webp" alt=""></span><span class="slab"><b>STAGE ${r.lock}</b><span>Unlocks soon!</span></span></div></div>`;
       const { w, b, L, s } = r.x, res = s.r2 || s.r1;
       const tag = s.phase === 'done' ? `<span class="sst">${starRow(starsOf(s))}${res ? ' ' + res.score + '/' + res.total : ''}</span>`
         : s.phase === 'retry' || s.phase === 'review' ? '<span class="sst warn">✏️ Làm lại câu sai</span>'
@@ -136,7 +151,7 @@ function mapHtml(d){
       return `<div class="mrow">${deco}<a class="st${s.phase === 'done' ? ' done' : ''}${cur === r.x ? ' cur' : ''}" style="left:${X}%" href="?w=${w}&b=${b}">
         ${isHere ? `<span class="me">${avHtml(me.av || AVATARS[0], 'av')}</span>` : ''}
         <span class="node k-${esc(String(L.kind).toLowerCase())}"><img src="img/ui/node-${/vocab/i.test(L.kind) ? 2 : 1}.webp" alt="${esc(L.icon || '')}">${cur === r.x ? '<em class="go">▶ Play</em>' : ''}</span>
-        <span class="slab"><b>Week ${w} · ${esc(L.kind)}</b><span>${esc(L.title)}</span>${tag}</span></a></div>`;
+        <span class="slab"><b>STAGE ${w} · ${esc(String(L.kind).toUpperCase())}</b><span>${esc(L.title)}</span>${tag}</span></a></div>`;
     }).join('')}</section>`;
 }
 // vẽ đường đi nối các chặng (sau khi trang đã hiện)

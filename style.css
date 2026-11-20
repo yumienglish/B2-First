@@ -577,3 +577,110 @@ img.deco{position:absolute;top:18px;transform:translateX(-50%);width:clamp(96px,
 .toast{position:fixed;left:50%;top:74px;transform:translateX(-50%);z-index:260;width:max-content;max-width:min(92vw,520px);background:#2b2d42;color:#fff;font-weight:800;font-size:17px;line-height:1.4;padding:12px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center}
 .toast small{font-weight:600;opacity:.75;font-size:13.5px}
 .toast.show{animation:bounce .45s}
+
+/* ===================== ESPORTS THEME (teen ~15 tuổi) ===================== */
+:root{--nx-bg:#0b0f1e;--nx-panel:#141a33;--nx-panel2:#1b2246;--nx-line:#2b3466;--nx-cyan:#22e3ff;--nx-pink:#ff2e88;--nx-lime:#b6ff3b;--nx-gold:#ffc83d;--nx-text:#e9edff;--nx-muted:#9ba5d8;
+  --brand:#1aa6c4;--brand-dark:#0d6a80;--accent:#ff2e88}
+body{background:
+  radial-gradient(900px 520px at 0% -5%,rgba(255,46,136,.20),transparent 60%),
+  radial-gradient(900px 620px at 105% 5%,rgba(34,227,255,.16),transparent 60%),
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px) 0 0/44px 44px,
+  linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/44px 44px,
+  #0b0f1e fixed}
+h1,h2,h3,.badge,.btn,.score,.stat b,.rkname,.maph,.part,.ghead b,.gbig,.st .slab b,.fxt{font-family:Rajdhani,"Chakra Petch",Nunito,system-ui,sans-serif;letter-spacing:.03em}
+/* đầu trang */
+.hero{background:linear-gradient(180deg,rgba(11,15,30,.05) 0%,rgba(11,15,30,.55) 70%,#0b0f1e 100%),url(img/ui/hero-teen.webp) center 70%/cover no-repeat,linear-gradient(120deg,#1b1240 0%,#0f2a4a 55%,#0b0f1e 100%);padding-bottom:70px}
+.hero::before,.hero::after{color:rgba(34,227,255,.55)}
+.hero h1{text-transform:uppercase;font-weight:700;letter-spacing:.08em;text-shadow:0 0 18px rgba(34,227,255,.65),0 3px 0 rgba(0,0,0,.4)}
+.hero p{color:#bff6ff;text-transform:uppercase;letter-spacing:.12em;font-size:13.5px;text-shadow:0 0 10px rgba(34,227,255,.5)}
+.pack{background:rgba(11,15,30,.75)!important;color:var(--nx-cyan)!important;border:2px solid var(--nx-cyan)!important;box-shadow:0 0 14px rgba(34,227,255,.35)!important;text-transform:uppercase;letter-spacing:.05em}
+.snd{background:rgba(11,15,30,.75);border:2px solid var(--nx-cyan);box-shadow:0 0 14px rgba(34,227,255,.35)}
+/* nút */
+.btn{background:linear-gradient(90deg,#22e3ff,#4f7cff);color:#06101f;text-transform:uppercase;font-weight:700;letter-spacing:.05em;border-radius:10px;box-shadow:0 4px 0 #1d3c8f,0 0 18px rgba(34,227,255,.25)}
+.btn.orange{background:linear-gradient(90deg,#ff2e88,#ff7a2e);color:#fff;box-shadow:0 4px 0 #8f1648,0 0 18px rgba(255,46,136,.3)}
+.btn.lite{background:#fff;color:#1d3c8f;border:2px solid #4f7cff;box-shadow:0 3px 0 #c9d6ff}
+.play{background:linear-gradient(180deg,#ff2e88,#c2185b);box-shadow:0 4px 0 #8f1648,0 0 16px rgba(255,46,136,.45)}
+/* trang bài làm: thẻ nội dung sáng, viền neon phía trên để dễ đọc */
+.card{border:none;border-top:3px solid var(--nx-cyan);border-radius:12px;box-shadow:0 0 0 1px rgba(43,52,102,.9),0 10px 26px rgba(0,0,0,.35)}
+.part{color:var(--nx-cyan);text-transform:uppercase;text-shadow:0 0 10px rgba(34,227,255,.45)}
+.part::after{background:linear-gradient(90deg,rgba(34,227,255,.6),transparent)}
+.badge{background:linear-gradient(90deg,#ff2e88,#8f6cf6);border-radius:6px;text-transform:uppercase}
+.bar{background:rgba(11,15,30,.94);border-top:1px solid var(--nx-line);color:var(--nx-text)}
+.bar .prog .t{color:var(--nx-text)}
+.prog .track{background:#232b55}
+.prog .fill{background:linear-gradient(90deg,#22e3ff,#b6ff3b)}
+.topbar{background:#141a33;border-color:var(--nx-pink);color:var(--nx-text);box-shadow:0 0 18px rgba(255,46,136,.35)}
+/* ===== TRANG CHỦ: bảng tối kiểu menu game ===== */
+body.home .card{background:linear-gradient(180deg,rgba(27,34,70,.92),rgba(20,26,51,.92));color:var(--nx-text);border-top-color:var(--nx-pink);backdrop-filter:blur(6px)}
+body.home .muted{color:var(--nx-muted)}
+.hi{background:linear-gradient(180deg,rgba(27,34,70,.95),rgba(20,26,51,.95))!important}
+.hi h2{color:#fff;text-transform:uppercase;text-shadow:0 0 14px rgba(34,227,255,.5)}
+.hiline{color:var(--nx-muted)}
+.stat{background:rgba(11,15,30,.6)!important;border:1px solid var(--nx-line);border-radius:10px}
+.stat b{color:var(--nx-cyan);font-size:26px}
+.stat:nth-child(2) b{color:var(--nx-lime)} .stat:nth-child(3) b{color:var(--nx-gold)}
+.stat span{color:var(--nx-muted);text-transform:uppercase;font-size:12px;letter-spacing:.08em}
+.rank{display:flex;align-items:center;gap:14px;max-width:520px;margin:16px auto 0;background:rgba(11,15,30,.55);border:1px solid var(--nx-line);border-radius:12px;padding:10px 14px;text-align:left}
+.rkimg{width:64px;height:64px;object-fit:contain;flex:none;filter:drop-shadow(0 0 10px rgba(255,200,61,.45))}
+.rkemo{font-size:46px;flex:none}
+.rkinfo{flex:1;min-width:0}
+.rkname{font-size:24px;font-weight:700;color:var(--nx-gold);text-transform:uppercase;line-height:1}
+.rkname small{font-size:13px;color:var(--nx-muted);letter-spacing:.15em}
+.rank .lvbar{height:12px;margin:8px 0 4px;background:#232b55;box-shadow:inset 0 0 0 1px var(--nx-line)}
+.rank .lvbar i{background:linear-gradient(90deg,#22e3ff,#b6ff3b);box-shadow:0 0 12px rgba(182,255,59,.6)}
+.rkx{font-size:13.5px;color:var(--nx-muted);font-weight:700}
+.rkx b{color:var(--nx-text)}
+/* Quick review */
+.qr{background:linear-gradient(120deg,rgba(60,40,10,.9),rgba(27,34,70,.92))!important;border-top-color:var(--nx-gold)!important}
+.qr .qrt b{color:#fff;text-transform:uppercase;font-family:Rajdhani,Nunito,sans-serif;letter-spacing:.05em;font-size:23px}
+.qr .qrt span{color:var(--nx-gold)} .qr .qrt small{color:var(--nx-muted)}
+/* bản đồ season */
+.map{background:
+  linear-gradient(rgba(34,227,255,.06) 1px,transparent 1px) 0 0/36px 36px,
+  linear-gradient(90deg,rgba(34,227,255,.06) 1px,transparent 1px) 0 0/36px 36px,
+  radial-gradient(ellipse at 50% 0%,rgba(143,108,246,.35),transparent 70%),
+  linear-gradient(180deg,#141a33,#0d1128)!important;border:1px solid var(--nx-line)!important;border-top:3px solid var(--nx-cyan)!important;border-radius:14px!important;box-shadow:0 10px 30px rgba(0,0,0,.4)!important}
+.maph{color:#fff!important;text-transform:uppercase;letter-spacing:.12em;text-shadow:0 0 14px rgba(34,227,255,.6)}
+.pth{stroke:rgba(34,227,255,.55)!important;stroke-width:4!important;stroke-dasharray:10 10!important;filter:drop-shadow(0 0 6px rgba(34,227,255,.8))}
+.pth.done{stroke:var(--nx-lime)!important;stroke-dasharray:none!important;stroke-width:5!important;filter:drop-shadow(0 0 8px rgba(182,255,59,.9))}
+.st .slab{background:rgba(11,15,30,.88);border:1px solid var(--nx-line);color:var(--nx-text);border-radius:8px}
+.st .slab b{color:var(--nx-cyan)!important;letter-spacing:.08em}
+.st .slab span{color:#fff}
+.st .sst{color:var(--nx-lime)!important} .st .sst.warn{color:var(--nx-gold)!important} .st .sst.new{color:var(--nx-pink)!important}
+.st.done .node::after{background:var(--nx-lime);color:#0b0f1e;border-color:#0b0f1e}
+.st .go{background:linear-gradient(90deg,#ff2e88,#ff7a2e);box-shadow:0 0 14px rgba(255,46,136,.6);text-transform:uppercase;letter-spacing:.05em}
+.st.exam .slab b{color:var(--nx-gold)!important}
+/* thành tích */
+.badges h2{color:#fff;text-transform:uppercase}
+.bcount{background:rgba(34,227,255,.15);color:var(--nx-cyan)}
+.bdg{background:rgba(11,15,30,.55);border:1px solid var(--nx-line)}
+.bdg b{color:var(--nx-muted)} .bdg small{color:#7480b8}
+.bdg.on{background:linear-gradient(160deg,rgba(255,46,136,.18),rgba(34,227,255,.12));border-color:var(--nx-pink);box-shadow:0 0 16px rgba(255,46,136,.3)}
+.bdg.on b{color:#fff}
+/* hộp chúc mừng, trò chơi */
+.fxov{background:rgba(5,8,20,.78)}
+.fxcard,.gcard{background:linear-gradient(180deg,#1b2246,#141a33);color:var(--nx-text);border:1px solid var(--nx-line);border-top:3px solid var(--nx-pink);box-shadow:0 0 40px rgba(255,46,136,.25)}
+.fxt,.gbig{color:#fff!important;text-shadow:0 0 16px rgba(255,46,136,.6)}
+.fxb{background:rgba(11,15,30,.6)} .fxb small{color:var(--nx-muted)}
+.gq{color:#fff!important} .gq.vi{color:var(--nx-text)!important}
+.gh,.gno{color:var(--nx-muted)}
+.gsc{background:rgba(182,255,59,.15);color:var(--nx-lime)}
+.gx,.gsay{background:#232b55;color:#fff}
+.gtime{background:#232b55}
+.gopt{background:#1b2246;color:var(--nx-text);border-color:var(--nx-line);box-shadow:0 4px 0 #0b0f1e}
+.gopt.ok{background:rgba(182,255,59,.15);border-color:var(--nx-lime);color:var(--nx-lime);box-shadow:0 4px 0 #0b0f1e}
+.gopt.bad{background:rgba(255,46,136,.15);border-color:var(--nx-pink);color:#ff8fbf}
+.gend p{color:var(--nx-text)}
+/* câu chọc / khen: hợp nền mới */
+.toast{background:#141a33;border:1px solid var(--nx-pink);box-shadow:0 0 24px rgba(255,46,136,.45)}
+
+/* nhân vật teen (hình cao) + sửa đầu trang trên điện thoại */
+.hmas{width:auto!important;height:clamp(170px,22vw,250px);left:14px;bottom:0;animation:none;filter:drop-shadow(0 0 14px rgba(34,227,255,.35))}
+@media (max-width:700px){.hmas{height:120px;right:4px;left:auto;top:-40px;bottom:auto}}
+.fxmas{width:auto!important;height:170px;margin:-110px auto 4px!important;filter:drop-shadow(0 0 16px rgba(255,46,136,.45))}
+.gmas{width:auto!important;height:150px;margin:0 auto 2px!important}
+.st .node{width:104px;height:104px}
+.pack{white-space:nowrap;display:inline-flex;gap:6px}
+@media (max-width:520px){.hero h1{font-size:21px;padding:0 50px;letter-spacing:.05em}.hero p{font-size:11.5px;padding:0 20px}.pack{font-size:15px!important;padding:8px 14px!important}}
+.fxov .fxcard{margin-top:120px}
+.fxmas{margin:-150px auto 10px!important}

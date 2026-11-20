@@ -186,7 +186,7 @@ const starRow = n => [1, 2, 3].map(i => `<span class="${i <= n ? '' : 'off'}">�
 
 function renderHome(){
   document.title = 'B2 First Adventure 🚀';
-  $('#heroSub').textContent = 'Explore · Practise · Level up · Shine ✨';
+  $('#heroSub').textContent = 'Train hard · Rank up · Beat the final boss 🎮'; document.body.classList.add('home');
   const me = lsGet(ME_KEY) || {};
   const first = String(me.name || '').trim().split(/\s+/).pop();
   const d = gameData(), { stars, words, done } = d; // fun.js
@@ -201,7 +201,7 @@ function renderHome(){
         <div class="stat"><b>📒 ${words}</b><span>new words</span></div>
         <div class="stat"><b>🏁 ${done}</b><span>adventures</span></div>
       </div>
-      <div class="lvl"><span class="lvn">🏆 Level ${lv}</span><div class="lvbar"><i style="width:${Math.round(xp / 6 * 100)}%"></i></div><span class="lvx">⭐ ${xp}/6</span></div>
+      ${rankHtml(stars)}
       ${stars ? '' : '<p class="muted small" style="margin:10px 0 0">Your first stars are waiting for you! ⭐</p>'}
     </section>
     ${reviewCard(d)}
