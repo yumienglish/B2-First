@@ -569,3 +569,11 @@ img.deco{position:absolute;top:18px;transform:translateX(-50%);width:clamp(96px,
 .fxmas{width:130px;height:auto;margin:-80px auto 0;display:block;filter:drop-shadow(0 6px 8px rgba(0,0,0,.15))}
 .gmas{width:120px;height:auto;display:block;margin:0 auto -6px}
 .btn.lite{background:#fff;color:var(--brand);border:2px solid var(--brand);box-shadow:0 3px 0 #b9e0e4}
+
+/* câu chọc / khen của cô + dòng nhắc nổi khi rời trang nhiều lần */
+.tease{margin:8px 0 4px;background:#fff4d6;border:2px solid #ffc46b;color:#b4531a;border-radius:14px;padding:8px 12px;font-weight:800;font-size:16.5px;line-height:1.45}
+.tease.good{background:#e7f9ee;border-color:#7fd6a2;color:#17804a}
+.mmsg small{display:block;margin-top:6px;font-size:14.5px;font-weight:600;color:var(--muted)}
+.toast{position:fixed;left:50%;top:74px;transform:translateX(-50%);z-index:260;width:max-content;max-width:min(92vw,520px);background:#2b2d42;color:#fff;font-weight:800;font-size:17px;line-height:1.4;padding:12px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center}
+.toast small{font-weight:600;opacity:.75;font-size:13.5px}
+.toast.show{animation:bounce .45s}

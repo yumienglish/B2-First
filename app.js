@@ -844,6 +844,20 @@ function memeOf(R){
   }
   return `<img class="meme" src="img/meme/${S.meme}.gif" alt="">`;
 }
+// Lần 1 dưới 70% → câu chọc; lần 2 → câu khen theo số câu đã sửa đúng. Giữ cố định khi mở lại trang.
+function teaseLine1(){
+  const R = S.r1; if (!R || !R.total || R.score / R.total >= .7) return '';
+  if (!S.tease1){ S.tease1 = tease('low1', { s: R.score, t: R.total, w: R.total - R.score }); save(); }
+  return `<div class="tease">${S.tease1}</div>`;
+}
+function praiseLine2(){
+  if (!S.tease2){
+    const ks = Object.keys(S.r1.items).filter(k => !S.r1.items[k].ok);
+    const f = ks.filter(k => S.r2.items[k] && S.r2.items[k].ok).length;
+    S.tease2 = tease(f === ks.length ? 'fixAll' : f ? 'fixSome' : 'fixNone', { f }); save();
+  }
+  return `<div class="tease good">${S.tease2}</div>`;
+}
 function renderSummary(){
   const box = $('#summaryBox');
   if (S.phase === 'work'){ box.innerHTML = ''; return; }
@@ -851,6 +865,7 @@ function renderSummary(){
     // sau lần 1: chỉ meme + điểm
     box.innerHTML = `<div class="card summary retry">${memeOf(S.r1)}
       <div class="sumr"><div class="score">${S.r1.score}<span>/${S.r1.total}</span></div>
+      ${teaseLine1()}
       <div class="status" id="sendStatus"></div></div></div>`;
     updateStatus();
     return;
@@ -859,6 +874,7 @@ function renderSummary(){
   const R = S.r2 || S.r1;
   box.innerHTML = `<div class="card summary">${S.r2 ? '' : memeOf(S.r1)}
     <div class="sumr"><div class="score">${R.score}<span>/${R.total}</span></div>
+    ${S.r2 ? praiseLine2() : ''}
     <div class="status" id="sendStatus"></div>
     ${R.score < R.total ? '<div class="big">Let’s review the answers below 👇</div>' : ''}</div></div>`;
   updateStatus();
@@ -886,16 +902,70 @@ function modal(msg, yes, no){
     m.hidden = false; n.focus();
   });
 }
+/* ============ CÂU CHỌC / KHEN CỦA CÔ (tiếng Việt, chọn ngẫu nhiên, không lặp câu vừa dùng) ============ */
+const TEASE = {
+  empty: [ // nộp khi còn trống > 25%
+    'Mới làm có <b>{x}/{n}</b> câu mà đã đòi nộp? Bài này đâu phải để ngắm đâu em 😏',
+    'Còn <b>{e} câu</b> trống trơn kìa. Em định để cô làm hộ à? 🙄',
+    'Bỏ trống nhiều thế này thì cô chấm bằng niềm tin à? Làm tiếp đi nào! 💪',
+    'Ơ kìa, mới khởi động thôi mà! Còn <b>{e} câu</b> đang chờ em đấy 👀'],
+  early: [ // nộp khi chưa đủ 3 phút
+    'Mới <b>{m} phút</b> đã xong {n} câu? Thần tốc thế này chắc em là người ngoài hành tinh 👽 Soát lại thêm <b>{r} phút</b> nữa nhé!',
+    'Nhanh thế! Em làm bài hay đang thi speedrun vậy? 😏 Đọc lại kĩ thêm <b>{r} phút</b> rồi hẵng nộp.',
+    'Đọc kĩ đề lại đi người đẹp! 😌 Còn <b>{r} phút</b> nữa mới được nộp.',
+    'Từ từ thôi, còn trẻ mà vội thế em? 😂 Còn <b>{r} phút</b> nữa mới được nộp.'],
+  away: [ // quay lại trang sau hơn 5 lần rời trang
+    'Người yêu nhắn tin hả em? 😏',
+    'Cô thấy hết đó nha! 👀',
+    'Search Google nhiều lần quá rồi đó em! 🔍',
+    'Đi đâu về vậy em? 🙃',
+    'Tự làm bài đi chứ người đẹp! 😌'],
+  low1: [ // điểm lần 1 dưới 70%
+    '{s}/{t}… Điểm này mà khoe với bố mẹ thì hơi run tay đấy 😬 Làm lại câu sai cho cô xem nào!',
+    'Hmm, {s}/{t}. Cô tin em làm được hơn thế nhiều. Hay em đang giấu nghề? 🤔',
+    'Sai tận {w} câu luôn hả? Xem lại ô Grammar rồi phục thù đi em ⚔️',
+    'Điểm này chưa xứng với em đâu. Chứng minh là cô đánh giá sai đi! 😤'],
+  fixAll: [ // lần 2: sửa đúng hết
+    'Sửa sạch bách luôn, đỉnh nóc kịch trần bay phấp phới! 🚀',
+    '10 điểm không có nhưng! Em slay quá trời luôn 💅',
+    'U là trời, keo lỳ ghê! Cô xin phép tự hào về em nha 🥹🏆',
+    'Out trình rồi đó em ơi, xịn xò hết nước chấm! 🔥'],
+  fixSome: [ // lần 2: sửa đúng một phần
+    'Gỡ được {f} câu rồi, căng đét! Mấy câu còn lại để cô cân trên lớp nha 💪',
+    'Có cố gắng là có điểm cộng nha, {f} câu lên xanh rồi đó, real luôn! 🌱',
+    'Không bỏ cuộc là chân ái! {f} câu đã được giải cứu 🦸',
+    'Đang lên level đó nha, tuần sau phải flex nhiều hơn nữa! 📈'],
+  fixNone: [ // lần 2: chưa sửa đúng câu nào
+    'Chưa ăn được câu nào nhưng dám thử lại là chill rồi. Xem đáp án bên dưới để hiểu vì sao nha 👇',
+    'Hơi ét o ét xíu, nhưng em đã không bỏ cuộc 💪 Đọc kĩ đáp án rồi tuần sau làm lại cho cô xem!'],
+  nofix: [ // bấm Nộp lần 2 khi chưa sửa câu nào
+    'Gửi cô 2 bản giống nhau làm giề? 🙄',
+    'Ủa có sửa đâu rồi nộp lần 2 chi? 😏',
+    'Em vừa sinh ra 1 cặp song sinh với điểm số y nguyên 👯'],
+};
+function tease(kind, vars = {}){
+  const list = TEASE[kind], last = lsGet('b2-tease') || {};
+  let i; do { i = Math.floor(Math.random() * list.length); } while (list.length > 1 && i === last[kind]);
+  last[kind] = i; lsSet('b2-tease', last);
+  return list[i].replace(/\{(\w)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : '');
+}
+// dòng nhắc nổi ở đầu màn hình, tự tắt
+function toast(html, ms = 4000){
+  let t = $('#toast');
+  if (!t){ document.body.insertAdjacentHTML('beforeend', '<div class="toast" id="toast" role="status" hidden></div>'); t = $('#toast'); }
+  t.innerHTML = html; t.hidden = false; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+  clearTimeout(toast.tm); toast.tm = setTimeout(() => { t.hidden = true; }, ms);
+}
 // Lần 1: chặn khi làm quá ít / quá nhanh, rồi hỏi lại
 async function guard1(left, total){
   if (modalOpen()) return false;
   if (left > total * MAX_EMPTY){
-    await modal(`📝 Em mới làm <b>${total - left}/${total}</b> câu.<br>Em làm tiếp rồi mới nộp bài nhé! 💪`, '', 'OK, em làm tiếp');
+    await modal(`📝 ${tease('empty', { x: total - left, n: total, e: left })}`, '', 'Dạ, em làm tiếp 😅');
     return false;
   }
   const mins = S.startedAt ? (Date.now() - new Date(S.startedAt)) / 60000 : MIN_MINUTES;
   if (mins < MIN_MINUTES){
-    await modal(`🎧 Em làm nhanh quá!<br>Kiểm tra lại bài thêm <b>${Math.ceil(MIN_MINUTES - mins)} phút</b> nữa rồi mới nộp được nhé.`, '', 'OK, em kiểm tra lại');
+    await modal(`⏱️ ${tease('early', { m: Math.max(1, Math.floor(mins)), n: total, r: Math.ceil(MIN_MINUTES - mins) })}`, '', 'Dạ, em soát lại 🧐');
     return false;
   }
   const go = await modal(left ? `Em còn <b>${left} câu</b> chưa làm.<br>Em chắc chắn muốn nộp bài cho cô?` : 'Em đã kiểm tra kĩ chưa?<br>Nộp bài cho cô nhé?', 'Nộp bài', 'Làm tiếp ✏️');
@@ -905,7 +975,7 @@ async function guard1(left, total){
 async function guard2(){
   if (modalOpen()) return false;
   const w = wrongKeys().length, c = fixedCount();
-  if (!c){ await modal('✏️ Em chưa sửa câu nào.<br>Sửa các câu sai rồi mới nộp lần 2 nhé!', '', 'OK, em sửa bài'); return false; }
+  if (!c){ await modal(`✏️ ${tease('nofix')}<br><small>Sửa các câu sai rồi mới nộp lần 2 nhé!</small>`, '', 'Dạ, em sửa bài 😅'); return false; }
   const go = await modal(`Em đã sửa <b>${c}/${w}</b> câu sai.<br>Nộp lần 2 cho cô nhé? Nộp xong sẽ hiện đáp án, không sửa được nữa.`, 'Nộp lần 2', 'Sửa tiếp ✏️');
   return go && S.phase === 'retry';
 }
@@ -1054,7 +1124,11 @@ let away = false, muteAway = false;
 function releaseAway(){ setTimeout(() => { muteAway = false; away = false; }, 800); }
 const tracking = () => S && !!S.startedAt && (S.phase === 'work' || S.phase === 'retry') && $('#work') && !$('#work').hidden;
 function goAway(){ if (muteAway || away || REC || !tracking()) return; away = true; S.leaves = (S.leaves || 0) + 1; save(); }
-function comeBack(){ if (!document.hidden && document.hasFocus()) away = false; }
+function comeBack(){
+  if (document.hidden || !document.hasFocus()) return;
+  const was = away; away = false;
+  if (was && tracking() && (S.leaves || 0) > 5) toast(`🕵️ ${tease('away')} <small>(rời trang ${S.leaves} lần)</small>`);
+}
 document.addEventListener('visibilitychange', () => document.hidden ? goAway() : comeBack());
 window.addEventListener('blur', goAway);
 window.addEventListener('focus', comeBack);
