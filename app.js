@@ -130,7 +130,11 @@ const PART_NO = parseInt(QP.get('b'), 10) || 1;
 // ?w=2&preview: cô xem trước bài chưa mở (học sinh không thấy link này trên trang chủ)
 const PREVIEW = QP.has('preview');
 const lessonsOf = w => [].concat(LESSONS[w] || []);
-const LESSON = WEEK_NO && (WEEK_NO <= OPEN_WEEK || PREVIEW) ? lessonsOf(WEEK_NO)[PART_NO - 1] || null : null;
+// ?sq=<id>: Side quest (video cô làm + câu hỏi), lưu riêng, mail ghi "Side quest"
+const SQ_ID = QP.get('sq');
+const LESSON = SQ_ID ? (SIDEQUESTS.find(x => x.id === SQ_ID && (x.week <= OPEN_WEEK || PREVIEW)) || null)
+  : WEEK_NO && (WEEK_NO <= OPEN_WEEK || PREVIEW) ? lessonsOf(WEEK_NO)[PART_NO - 1] || null : null;
+const myKey = () => SQ_ID ? 'b2-sq-' + SQ_ID : storeKey(WEEK_NO, PART_NO);
 const ME_KEY = 'b2-me';
 const storeKey = (w, b) => 'b2-w' + w + '-' + (b || 1);
 // Từ chép vở của 1 bài: newWords + newWordsAfter (từ là đáp án, chỉ hiện sau khi nộp xong)
@@ -221,6 +225,7 @@ function renderHome(){
       <img class="hmas" src="img/ui/mascot-1.webp" alt="">
       ${me.av ? `<div class="hiav">${avHtml(me.av, 'av big')}</div>` : ''}
       <h2>Hi ${first ? esc(first) : 'superstar'}! 🌟</h2>
+      ${titleChip(d)}
       <p class="hiline">${hiLine()}</p>
       <div class="stats">
         <div class="stat"><b>⭐ ${stars}</b><span>stars</span></div>
@@ -231,6 +236,8 @@ function renderHome(){
       ${stars ? '' : '<p class="muted small" style="margin:10px 0 0">Your first stars are waiting for you! ⭐</p>'}
     </section>
     ${reviewCard(d)}
+    ${revengeCard()}
+    ${sideQuestCard()}
     ${mapHtml(d)}
     ${badgesHtml(d)}`;
   afterHome();
@@ -291,7 +298,7 @@ function qText(q){
 let S = null;
 // phase: work → (Submit) review: xem đúng/sai, khoá hết → (Làm lại câu sai) retry: chỉ hiện câu sai + gợi ý → (Nộp lần 2) done
 const blank = () => ({ name: '', cls: '', startedAt: null, leaves: 0, a: {}, tick: {}, rec: {}, phase: 'work', r1: null, r2: null, sid: '', sent1: false, sent2: false, retryAt: null });
-const save = () => lsSet(storeKey(WEEK_NO, PART_NO), S);
+const save = () => lsSet(myKey(), S);
 
 /* ============ GHI ÂM (giống KET; lưu IndexedDB để không mất khi đóng trang) ============ */
 // RECS = các ô ghi âm của bài: đọc to (1 file/bài) và bài nói (1 file/câu)
@@ -319,7 +326,7 @@ const within = (p, ms = 4000) => Promise.race([p, new Promise((_, rej) => setTim
 async function idbPut(k, v){ const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('rec', 'readwrite'); t.objectStore('rec').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
 async function idbGet(k){ const d = await idb(); return new Promise((res, rej) => { const q = d.transaction('rec').objectStore('rec').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => rej(q.error); }); }
 const RECBLOB = {};
-const recId = qk => 'w' + WEEK_NO + '-' + PART_NO + '-' + qk;
+const recId = qk => (SQ_ID ? 'sq' + SQ_ID : 'w' + WEEK_NO + '-' + PART_NO) + '-' + qk;
 async function storeRec(qk, blob){ RECBLOB[qk] = blob; try { await within(blob.arrayBuffer().then(buf => idbPut(recId(qk), { buf, type: blob.type }))); } catch (e) {} }
 async function loadRec(qk){
   if (RECBLOB[qk]) return RECBLOB[qk];
@@ -595,7 +602,7 @@ function paintAfterWords(){
 }
 function buildLesson(){
   document.title = 'B2 ' + LESSON.kind + ' · ' + LESSON.title;
-  $('#heroSub').textContent = `Week ${WEEK_NO} · ${LESSON.kind} · ${LESSON.code}: ${LESSON.title}`;
+  $('#heroSub').textContent = SQ_ID ? `🎬 Side quest · ${LESSON.title}` : `Week ${WEEK_NO} · ${LESSON.kind} · ${LESSON.code}: ${LESSON.title}`;
   buildQS(); buildRecs();
   const allWords = (LESSON.newWords || []).filter(k => VOCAB[k]);
   $('#app').innerHTML = `
@@ -615,6 +622,7 @@ function buildLesson(){
       <div id="summaryBox"></div>
       <div class="card who" id="whoBar"></div>
       <section class="card guide">
+        ${LESSON.video ? sqVideo(LESSON) : ''}
         ${allWords.length ? `<h2>📒 New words</h2>
         <div class="note">${LESSON.copy === false ? '📖 Học kĩ các từ này trước khi làm bài nha! Chạm vào từ để nghe đọc.' : '✍️ Chép từ mới vào vở nha! Chạm vào từ màu vàng để xem nghĩa.'}</div>
         ${LESSON.wordsImg ? aiImg(LESSON.wordsImg) : ''}
@@ -1079,7 +1087,7 @@ const secsBetween = (a, b) => a && b ? Math.max(0, Math.round((new Date(b) - new
 
 // Giống các trang BTVN khác: lần 1 gửi ngay; lần 2 gửi kèm kết quả lần 1 để mail so sánh 2 lần.
 const makeSid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-const base = () => ({ app: 'btvn', unit: 'B2 ' + LESSON.kind, title: `B2 First ${LESSON.kind} ${LESSON.code} ${LESSON.title} – Week ${WEEK_NO}` + redoTitle(), name: S.name, cls: S.cls, sid: S.sid || '', redo: S.redo || 0 });
+const base = () => ({ app: 'btvn', unit: SQ_ID ? 'B2 Side quest' : 'B2 ' + LESSON.kind, title: (SQ_ID ? `B2 First Side quest: ${LESSON.title}` : `B2 First ${LESSON.kind} ${LESSON.code} ${LESSON.title} – Week ${WEEK_NO}`) + redoTitle(), name: S.name, cls: S.cls, sid: S.sid || '', redo: S.redo || 0 });
 // withRec: mail lần 1 có thêm các dòng ghi âm (cô chấm, file đính kèm); mail lần 2 chỉ so sánh câu chấm điểm
 function itemsOf(R, withRec){
   const out = [];
@@ -1175,12 +1183,12 @@ function boot(){
   yaSync();
   if (!LESSON){
     $('#bar').hidden = true;
-    if (WEEK_NO) { $('#app').innerHTML = '<div class="card">🔒 Bài này chưa mở. <a href="./">← Quay lại danh sách bài</a></div>'; return; }
+    if (WEEK_NO || SQ_ID) { $('#app').innerHTML = '<div class="card">🔒 Bài này chưa mở. <a href="./">← Quay lại danh sách bài</a></div>'; return; }
     renderHome(); return;
   }
   $('#back').hidden = false;
-  S = Object.assign(blank(), lsGet(storeKey(WEEK_NO, PART_NO)) || {});
-  const redone = applyRedo(storeKey(WEEK_NO, PART_NO)); // mở link làm lại của cô
+  S = Object.assign(blank(), lsGet(myKey()) || {});
+  const redone = applyRedo(myKey()); // mở link làm lại của cô
   buildLesson();
   if (redone) $('#startErr').insertAdjacentHTML('beforebegin', REDO_MSG);
   $('#submitBtn').addEventListener('click', onSubmit);

@@ -358,3 +358,40 @@ const LESSONS = {
     ],
   }],
 };
+
+/* =====================================================================
+   BOSS FIGHT – mini mock test B2 First (Use of English Part 1–4), mở sau mỗi 4 tuần.
+   Câu hỏi soạn mới, chỉ dùng ngữ pháp + từ vựng các Unit đã học. Cùng cú pháp với bài học:
+   ((a/*b)) chọn · [[x|y]] gõ chữ. p = Part (1–4). ult: true = câu ULTIMATE (khó, gây/nhận sát thương x2).
+   Part 3: base = từ gốc (IN HOA). Part 4: first = câu gốc, key = từ cho sẵn.
+   after = mở khi OPEN_WEEK >= after (cô xem trước: ?boss=boss1&preview).
+   ===================================================================== */
+const BOSSES = [
+  { id: 'boss1', after: 4, name: 'Tense Titan', img: 'boss-1', units: 'Unit 1 · Unit 25',
+    qs: [
+      { p: 1, t: 'From the top of the hill we had a breathtaking ((*view/sight/look/scene)) of the whole valley.', h: 'have a … of something = nhìn thấy toàn cảnh.' },
+      { p: 1, t: 'The path to the waterfall was very ((*steep/high/tall/sharp)), so we walked slowly.', h: 'Đường dốc đứng, khó đi lên.' },
+      { p: 1, t: 'We stopped next to a small ((*stream/wave/tide/current)) to fill our water bottles.', h: 'Dòng nước nhỏ chảy trên núi.' },
+      { p: 1, t: 'In the evening a thick ((*fog/smoke/steam/dust)) came down and we could hardly see the road.', h: 'Hiện tượng thời tiết làm khó nhìn thấy đường.' },
+      { p: 2, t: 'Hi Sam! I [[am]] writing to you from a campsite in the mountains.', h: 'Việc đang làm ngay lúc viết thư.' },
+      { p: 2, t: 'We [[are]] staying here until Sunday, and then we drive home.', h: 'Kế hoạch / việc tạm thời: hiện tại tiếp diễn.' },
+      { p: 2, t: 'Every morning we get up early, but today it is raining, so we [[are|\'re]] playing cards in the tent.', h: 'Việc đang diễn ra lúc này.' },
+      { p: 2, t: 'What [[do]] you usually do at the weekend?', h: 'Câu hỏi về thói quen: hiện tại đơn.' },
+      { p: 3, base: 'ROCK', t: 'We climbed up a narrow [[rocky]] path to reach the top.', h: 'Cần tính từ đứng trước danh từ “path”.' },
+      { p: 3, base: 'FOG', t: 'It was such a [[foggy]] morning that we couldn’t see the lake.', h: 'Tính từ chỉ thời tiết, đuôi giống “misty”.' },
+      { p: 3, base: 'BREATH', t: 'The view from the summit was absolutely [[breathtaking]].', h: 'Tính từ ghép: đẹp đến “nín thở”.', ult: true },
+      { p: 3, base: 'DANGER', t: 'Swimming in the river can be [[dangerous]] after heavy rain.', h: 'Cần tính từ sau “be”.' },
+      { p: 4, first: 'There is a strange taste in this milk.', key: 'TASTES', t: 'This milk [[tastes strange|tastes a bit strange|tastes very strange]].', h: '“taste” là động từ trạng thái: dùng thì đơn.', ult: true },
+      { p: 4, first: 'It annoys me that Tom arrives late so often.', key: 'ALWAYS', t: 'Tom [[is always arriving late|\'s always arriving late|is always coming late|\'s always coming late]], which annoys me.', h: '“always” + hiện tại tiếp diễn để phàn nàn.', ult: true },
+      { p: 4, first: 'This bike belongs to my brother.', key: 'OWNS', t: 'My brother [[owns this bike]].', h: 'Động từ trạng thái chỉ sở hữu.', ult: true },
+      { p: 4, first: 'What’s your opinion of the new teacher?', key: 'THINK', t: 'What [[do you think of|do you think about]] the new teacher?', h: '“think” = có ý kiến → thì đơn.', ult: true },
+    ] },
+];
+
+/* =====================================================================
+   SIDE QUEST – video cô tự làm (Google Drive, chia sẻ "Bất kỳ ai có đường liên kết").
+   Mỗi quest là 1 bài như bài tuần (cùng cú pháp), thêm: id, week (mở khi OPEN_WEEK >= week),
+   video = ID file Drive (phần giữa /d/…/view), mins = độ dài video.
+   newWords = từ cần chép vở. Link riêng: ?sq=<id> (cô xem trước: &preview).
+   ===================================================================== */
+const SIDEQUESTS = [];

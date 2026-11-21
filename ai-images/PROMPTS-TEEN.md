@@ -53,3 +53,22 @@ A single game-ability icon: an angular rounded-square tile, dark with a neon yel
 ```
 A set of 16 profile portraits of different teenagers aged 15–17 in modern esports game-art style, arranged in a neat 4 × 4 grid, each alone in its own equal square cell with clear empty space, not touching. Each: head and shoulders, facing the viewer, inside a dark circle with a neon rim (a different neon colour for each). Mostly East and Southeast Asian teens, plus a few others; 8 boys and 8 girls; different hairstyles and outfits – gaming headsets, earbuds, hoodies, caps, bomber jackets, glasses; confident and friendly expressions. Transparent background (PNG). Square format 1:1.
 ```
+
+## 8. `teen-bosses.png` – 4 boss (Boss Fight, 2×2)
+```
+A set of 4 boss monsters for a competitive game, arranged in a 2 × 2 grid, each alone in its own equal square cell with clear empty space, not touching. Menacing but suitable for teenagers (no blood, no gore). Full body, facing the viewer, dramatic neon rim light:
+1 (top left) Tense Titan – a giant armoured mech titan with a glowing clock face and turning gears in its chest, cyan and magenta lights;
+2 (top right) Vocab Hydra – a three-headed serpent dragon made of glowing blue and purple crystal;
+3 (bottom left) Clause Kraken – a cyber kraken with glowing tentacles covered in circuit patterns, lime and cyan;
+4 (bottom right) Exam Overlord – a dark armoured overlord on a floating throne, gold crown, purple flames (the final boss).
+Transparent background (PNG). Square format 1:1.
+```
+
+## 9. `teen-phantoms.png` – 3 "Mistake Phantom" (Revenge mode, 3×1)
+```
+A set of 3 small enemy creatures called Mistake Phantoms, side by side in one row, each alone with clear empty space, not touching. Spooky-cool, not scary for teenagers:
+1 (left) a glitchy hooded phantom with glowing red eyes and red X marks floating around it;
+2 (middle) a shadow ninja made of black smoke with a glowing red visor;
+3 (right) a small corrupted golem made of broken pixel blocks with red glowing cracks.
+Full body, facing the viewer. Transparent background (PNG). Square format 1:1.
+```

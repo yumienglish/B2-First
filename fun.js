@@ -75,8 +75,10 @@ function gameData(){
   });
   words = pool.length;
   weeks.forEach(w => { const ok = states.filter(x => x.w === w).every(x => x.s.phase === 'done'); run = ok ? run + 1 : 0; maxStreak = Math.max(maxStreak, run); });
-  const stars = lessonStars + rev.stars;
-  return { weeks, states, rev, lessonStars, stars, words, done, maxStreak, pool };
+  const bt = Object.assign({ stars: 0, beaten: {}, wins: 0, flawless: 0, boss: {} }, lsGet('b2-battle') || {});
+  const bat = { beaten: Object.keys(bt.beaten).length, wins: bt.wins, flawless: bt.flawless, bossWins: Object.values(bt.boss).filter(x => x && x.win).length };
+  const stars = lessonStars + rev.stars + (bt.stars || 0);
+  return { weeks, states, rev, lessonStars, stars, words, done, maxStreak, pool, bat };
 }
 
 /* ---------- Rank (theo tổng sao) ---------- */
@@ -92,6 +94,55 @@ function rankHtml(stars){
     <div class="rkinfo"><div class="rkname">${r.n} <small>RANK</small></div>
       <div class="lvbar"><i style="width:${pct}%"></i></div>
       <div class="rkx">${nx ? `⭐ ${stars}/${nx.min} to <b>${nx.n}</b>` : '⭐ ' + stars + ' · Top rank! 👑'}</div></div></div>`;
+}
+
+const rankIdx = stars => { let i = 0; RANKS.forEach((r, j) => { if (stars >= r.min) i = j; }); return i; };
+// khung avatar neon theo rank (body.rk-1 … rk-6)
+function applyRankFrame(){ try { const i = rankIdx(gameData().stars) + 1; document.body.className = document.body.className.replace(/\brk-\d\b/g, '').trim(); document.body.classList.add('rk-' + i); } catch (e) {} }
+
+/* ---------- Danh hiệu (chọn 1 để hiện cạnh tên) ---------- */
+const TITLE_KEY = 'b2-title';
+const TITLES = [
+  { id: 'rookie', n: 'Rookie', vi: 'Danh hiệu khởi đầu', test: () => true },
+  { id: 'explorer', n: 'Explorer', vi: 'Làm xong bài đầu tiên', test: d => d.done >= 1 },
+  { id: 'sniper', n: 'Grammar Sniper', vi: 'Đúng hết ngay lần 1 một bài Grammar', test: d => d.states.some(x => /gram/i.test(x.L.kind) && x.s.r1 && x.s.r1.total && x.s.r1.score === x.s.r1.total) },
+  { id: 'hunter', n: 'Vocab Hunter', vi: 'Học được 30 từ mới', test: d => d.words >= 30 },
+  { id: 'speed', n: 'Speed Demon', vi: 'Đạt 10/10 trong Quick review', test: d => d.rev.best >= 10 },
+  { id: 'comeback', n: 'Comeback Kid', vi: 'Làm lại câu sai và sửa đúng hết', test: d => d.states.some(x => x.s.r2 && x.s.r2.score === x.s.r2.total) },
+  { id: 'slayer', n: 'Mistake Slayer', vi: 'Hạ gục 15 câu sai trong Revenge mode', test: d => d.bat.beaten >= 15 },
+  { id: 'assassin', n: 'Silent Assassin', vi: 'Thắng Revenge mà không mất máu', test: d => d.bat.flawless >= 1 },
+  { id: 'bossslayer', n: 'Boss Slayer', vi: 'Đánh bại 1 Boss', test: d => d.bat.bossWins >= 1 },
+  { id: 'diamond', n: 'Diamond Mind', vi: 'Lên rank Diamond', test: d => d.stars >= 42 },
+];
+function activeTitle(d){
+  d = d || gameData(); const got = TITLES.filter(t => t.test(d)), id = lsGet(TITLE_KEY);
+  return got.find(t => t.id === id) || got[got.length - 1];
+}
+function titleChip(d){ const t = activeTitle(d); return `<button class="ttl" type="button" id="ttlBtn">🏷️ <b>${esc(t.n)}</b> <span>▾</span></button>`; }
+function openTitles(){
+  const d = gameData(), cur = activeTitle(d);
+  const ov = document.createElement('div'); ov.className = 'fxov';
+  ov.innerHTML = `<div class="fxcard ttlcard"><div class="fxt">🏷️ Choose your title</div><div class="ttls">${TITLES.map(t => { const on = t.test(d);
+    return `<button type="button" class="ttlo${on ? '' : ' off'}${t.id === cur.id ? ' cur' : ''}" data-t="${t.id}"${on ? '' : ' disabled'}><b>${on ? '' : '🔒 '}${esc(t.n)}</b><small>${esc(t.vi)}</small></button>`; }).join('')}</div>
+    <button class="btn lite" type="button" id="ttlClose">Close</button></div>`;
+  ov.addEventListener('click', ev => {
+    const b = ev.target.closest('.ttlo'); if (b && !b.disabled){ lsSet(TITLE_KEY, b.dataset.t); sfx('pop'); ov.remove(); renderHome(); return; }
+    if (ev.target === ov || ev.target.id === 'ttlClose') ov.remove();
+  });
+  document.body.appendChild(ov);
+}
+
+/* ---------- Side quest (video cô làm) ---------- */
+function sideQuestCard(){
+  const qs = SIDEQUESTS.filter(x => x.week <= OPEN_WEEK || PREVIEW); if (!qs.length) return '';
+  return `<section class="card sqc"><h2>🎬 Side quests <small>Watch · answer · copy new words</small></h2><div class="sqgrid">${qs.map(x => {
+    const s = lsGet('b2-sq-' + x.id) || {}, r = s.r2 || s.r1;
+    const tag = s.phase === 'done' ? `<span class="sst">${starRow(starsOf(s))} ${r ? r.score + '/' + r.total : ''}</span>` : s.startedAt ? '<span class="sst warn">⏳ In progress</span>' : '<span class="sst new">🆕 New</span>';
+    return `<a class="sqi" href="?sq=${encodeURIComponent(x.id)}${PREVIEW ? '&preview' : ''}"><span class="sqth" style="background-image:url('https://drive.google.com/thumbnail?id=${encodeURIComponent(x.video)}&sz=w480')"><i>▶</i>${x.mins ? `<em>${x.mins} min</em>` : ''}</span><b>${esc(x.title)}</b>${tag}</a>`; }).join('')}</div></section>`;
+}
+function sqVideo(L){
+  return `<div class="sqvid"><iframe src="https://drive.google.com/file/d/${encodeURIComponent(L.video)}/preview" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe></div>
+    <div class="note">🎬 Xem hết video trước, rồi làm các câu hỏi bên dưới. Nhớ chép từ mới vào vở nha!</div>`;
 }
 
 /* ---------- Huy hiệu ---------- */
@@ -137,11 +188,22 @@ function mapHtml(d){
   const here = cur || d.states[d.states.length - 1];
   const rows = d.states.map(x => ({ x }));
   if (LESSONS[OPEN_WEEK + 1]) rows.push({ lock: OPEN_WEEK + 1 });
+  // Boss: đã mở → đứng sau tuần B.after; chưa mở → hiện Boss kế tiếp (khoá) trước đích
+  let nextShown = false;
+  BOSSES.forEach(B => {
+    const st = (lsGet('b2-battle') || {}).boss || {}, row = { boss: B, open: bossOpen(B), rec: st[B.id] || null };
+    if (row.open){ let at = rows.length; rows.forEach((r, i) => { if (r.x && r.x.w <= B.after) at = i + 1; }); rows.splice(at, 0, row); }
+    else if (!nextShown){ nextShown = true; rows.push(row); }
+  });
   rows.push({ exam: true });
   return `<section class="map" id="map"><h2 class="maph">🎮 Season map</h2><svg class="mpath" id="mpath" aria-hidden="true"></svg>
     ${rows.map((r, i) => {
       const z = ZONES[i % ZONES.length], X = XS[i % XS.length], deco = '';
       if (r.exam) return `<div class="mrow">${deco}<div class="st lock exam" style="left:${X}%"><span class="node"><img src="img/ui/node-4.webp" alt=""></span><span class="slab"><b>FINAL BOSS</b><span>B2 First exam 🎓</span></span></div></div>`;
+      if (r.boss){ const B = r.boss, n = BOSSES.indexOf(B) + 1, win = r.rec && r.rec.win;
+        return `<div class="mrow">${deco}<a class="st boss${r.open ? '' : ' lock'}${win ? ' done' : ''}${r.open && !win ? ' cur' : ''}" style="left:${X}%" href="#" data-boss="${B.id}">
+          <span class="node"><img src="img/ui/${B.img}.webp" alt="🐉" onerror="this.src='img/ui/node-4.webp'">${r.open && !win ? '<em class="go">⚔️ Fight</em>' : ''}</span>
+          <span class="slab"><b>BOSS ${n} · ${esc(B.name)}</b><span>${r.open ? (win ? '✔ Defeated' : r.rec ? 'Try again!' : 'Mini mock test') : 'Opens after Week ' + B.after}</span>${r.rec ? `<span class="sst">Best ${r.rec.best}/${B.qs.length}</span>` : ''}</span></a></div>`; }
       if (r.lock) return `<div class="mrow">${deco}<div class="st lock" style="left:${X}%"><span class="node"><img src="img/ui/node-3.webp" alt=""></span><span class="slab"><b>STAGE ${r.lock}</b><span>Unlocks soon!</span></span></div></div>`;
       const { w, b, L, s } = r.x, res = s.r2 || s.r1;
       const tag = s.phase === 'done' ? `<span class="sst">${starRow(starsOf(s))}${res ? ' ' + res.score + '/' + res.total : ''}</span>`
@@ -253,4 +315,8 @@ function afterHome(){
   const cur = $('#map .st.cur');
   if (cur && $$('#map .st').indexOf(cur) >= 3) cur.scrollIntoView({ block: 'center' });
   setTimeout(checkBadges, 600);
+  const tb = $('#ttlBtn'); if (tb) tb.onclick = openTitles;
+  applyRankFrame();
+  if (typeof afterHomeBattle === 'function') afterHomeBattle();
 }
+applyRankFrame();
