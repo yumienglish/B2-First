@@ -28,3 +28,14 @@ Link cho học sinh: https://yumienglish.github.io/B2-First/
 
 ## Nộp bài
 Dùng chung máy chủ Code.gs với các trang BTVN (unit `B2 First`): lần 1 chấm và gửi mail ngay; học sinh làm lại câu sai (có gợi ý), nộp lần 2 → mail so sánh lần 1 / lần 2, thời gian làm bài và số lần rời trang.
+
+## Revenge · Boss · Side quest (battle.js)
+- **Revenge mode** (trang chủ): đánh lại các câu sai lần 1 của những bài đã xong. Câu vẫn sai ở lần 2 = ⚡ ULTIMATE.
+- **Boss fight**: `BOSSES` trong `lessons.js`.
+  - Mỗi boss mở khi `OPEN_WEEK >= after`.
+  - Câu hỏi soạn theo dạng Use of English Part 1–4. `p` = Part, `ult: true` = câu ULTIMATE, `base` = từ gốc (Part 3), `first` + `key` = câu gốc + từ cho sẵn (Part 4).
+  - Cô xem trước: `?boss=boss1&preview` (không gửi mail).
+- **Side quest**: `SIDEQUESTS` trong `lessons.js`.
+  - Mỗi quest viết như 1 bài, thêm `id`, `week`, `video` (ID file Google Drive, file phải để "Bất kỳ ai có đường liên kết"), `mins`.
+  - Link `?sq=<id>`; cô xem trước: `&preview`.
+- Kết quả Revenge (mỗi ngày), Boss (trận đầu) và Side quest đều gửi mail cho cô như bài tập và được tính XP.
