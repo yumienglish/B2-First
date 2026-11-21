@@ -168,7 +168,9 @@ function starsOf(s){
 }
 /* ============ AVATAR ============ */
 const AVATARS = Array.from({ length: 16 }, (_, i) => 'a' + (i + 1)); // img/ui/av-1…16.webp
-const avHtml = (av, c = 'av') => /^data:image\//.test(av || '') ? `<img class="${c}" src="${av}" alt="">`
+const avHtml = (av, c = 'av') => av === 'char' && window.YumiAvatar && window.YumiAuth && YumiAuth.me() && /^teen:\{/.test(YumiAuth.me().avatar || '')
+    ? `<span class="${c} avchar">${YumiAvatar.html(YumiAuth.me().avatar, { crop: 'head' })}</span>` // nhân vật tủ đồ
+  : /^data:image\//.test(av || '') ? `<img class="${c}" src="${av}" alt="">`
   : /^a\d+$/.test(av || '') ? `<img class="${c}" src="img/ui/av-${av.slice(1)}.webp" alt="">` : `<span class="${c}">${esc(av || '🙂')}</span>`;
 let AV = '';
 // ảnh trong máy → cắt vuông, thu nhỏ 160px (chỉ lưu trên máy này, không gửi đi)
@@ -195,12 +197,13 @@ const YA_OPTS = { mascot: 'img/ui/mascot-1.webp', title: 'B2 First Adventure �
   theme: { bg: 'radial-gradient(900px 520px at 0% -5%,rgba(255,46,136,.28),transparent 60%),radial-gradient(900px 620px at 105% 5%,rgba(34,227,255,.22),transparent 60%),#0b0f1e',
     card: 'linear-gradient(180deg,#1b2246,#141a33)', text: '#e9edff', acc: '#ff2e88', acc2: '#8f6cf6', ring: 'rgba(34,227,255,.28)',
     font: 'Nunito,system-ui,sans-serif', head: 'Rajdhani,"Chakra Petch",Nunito,system-ui,sans-serif', dark: true } };
-function yaSync(){ // tên + lớp lấy theo tài khoản (giữ avatar đã chọn)
+const yaChar = () => { const m = YA && YA.me(); return !!(m && /^teen:\{/.test(m.avatar || '')); }; // đã có nhân vật tủ đồ
+function yaSync(){ // tên + lớp lấy theo tài khoản; có nhân vật thì avatar = nhân vật
   const m = YA && YA.me(); if (!m) return;
-  lsSet(ME_KEY, Object.assign(lsGet(ME_KEY) || {}, { name: m.fullName || m.name, cls: m.cls }));
+  lsSet(ME_KEY, Object.assign(lsGet(ME_KEY) || {}, { name: m.fullName || m.name, cls: m.cls }, yaChar() ? { av: 'char' } : {}));
 }
 function yaAvatar(){ // gửi avatar lên bảng xếp hạng (ảnh tự chụp thì không gửi)
-  const a = AV || (lsGet(ME_KEY) || {}).av; if (!YA || !a || /^data:/.test(a)) return;
+  const a = AV || (lsGet(ME_KEY) || {}).av; if (!YA || !a || /^data:/.test(a) || a === 'char') return;
   YA.setAvatar(/^a\d+$/.test(a) ? new URL(`img/ui/av-${a.slice(1)}.webp`, location.href).pathname : a);
 }
 function yaHome(){
@@ -210,8 +213,13 @@ function yaHome(){
   row.appendChild(YA.trophy({ theme: YA_OPTS.theme }));
   const out = document.createElement('button'); out.type = 'button'; out.className = 'linkbtn'; out.textContent = 'Log out';
   out.onclick = () => YA.logout();
+  if (window.YumiAvatar) row.appendChild(YumiAvatar.button({ style: 'teen', theme: YA_OPTS.theme, onSave: () => { yaSync(); renderHome(); } }));
   row.appendChild(out); card.appendChild(row);
-  yaAvatar(); YA.autoBoard({ theme: YA_OPTS.theme });
+  yaAvatar();
+  // lần đầu: tạo nhân vật (chỉ đồ miễn phí) → vẽ lại trang chủ với nhân vật, rồi mới hiện bảng xếp hạng
+  const done = () => YA.autoBoard({ theme: YA_OPTS.theme });
+  if (window.YumiAvatar) YumiAvatar.ensure({ style: 'teen', theme: YA_OPTS.theme }).then(v => { if (v) { yaSync(); renderHome(); } else done(); }).catch(done);
+  else done();
 }
 
 function renderHome(){
@@ -698,6 +706,7 @@ function buildLesson(){
     ['inName', 'inCls'].forEach(id => { $('#' + id).closest('.field').hidden = true; });
     $('#start h2').textContent = `👋 Hi ${m.name}!`;
     $('#start p.muted').innerHTML = 'Chọn avatar rồi bấm <b>Start</b>.';
+    if (yaChar()){ AV = 'char'; const f = $('#avPick') && $('#avPick').closest('.field'); if (f) f.hidden = true; $('#start p.muted').innerHTML = 'Bấm <b>Start</b> để bắt đầu.'; }
   }
   $('#startBtn').addEventListener('click', onStart);
   ['inName', 'inCls'].forEach(id => $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') onStart(); }));
