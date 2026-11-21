@@ -184,6 +184,32 @@ function paintAvPick(){
 }
 const starRow = n => [1, 2, 3].map(i => `<span class="${i <= n ? '' : 'off'}">⭐</span>`).join('');
 
+/* ============ TÀI KHOẢN YUMI (đăng nhập + bảng xếp hạng, script chung /yumi-auth.js) ============ */
+// YA = null khi công tắc chung chưa bật (hoặc script chung không tải được) → trang chạy như cũ, gõ tên.
+const YA = window.YumiAuth && YumiAuth.ready() ? YumiAuth : null;
+const YA_OPTS = { mascot: 'img/ui/mascot-1.webp', title: 'B2 First Adventure 🎮', sub: 'Log in to start your season 🏆',
+  theme: { bg: 'radial-gradient(900px 520px at 0% -5%,rgba(255,46,136,.28),transparent 60%),radial-gradient(900px 620px at 105% 5%,rgba(34,227,255,.22),transparent 60%),#0b0f1e',
+    card: 'linear-gradient(180deg,#1b2246,#141a33)', text: '#e9edff', acc: '#ff2e88', acc2: '#8f6cf6', ring: 'rgba(34,227,255,.28)',
+    font: 'Nunito,system-ui,sans-serif', head: 'Rajdhani,"Chakra Petch",Nunito,system-ui,sans-serif', dark: true } };
+function yaSync(){ // tên + lớp lấy theo tài khoản (giữ avatar đã chọn)
+  const m = YA && YA.me(); if (!m) return;
+  lsSet(ME_KEY, Object.assign(lsGet(ME_KEY) || {}, { name: m.fullName || m.name, cls: m.cls }));
+}
+function yaAvatar(){ // gửi avatar lên bảng xếp hạng (ảnh tự chụp thì không gửi)
+  const a = AV || (lsGet(ME_KEY) || {}).av; if (!YA || !a || /^data:/.test(a)) return;
+  YA.setAvatar(/^a\d+$/.test(a) ? new URL(`img/ui/av-${a.slice(1)}.webp`, location.href).pathname : a);
+}
+function yaHome(){
+  if (!YA) return;
+  const card = $('#app .hi'); if (!card) return;
+  const row = document.createElement('div'); row.className = 'yarow';
+  row.appendChild(YA.trophy({ theme: YA_OPTS.theme }));
+  const out = document.createElement('button'); out.type = 'button'; out.className = 'linkbtn'; out.textContent = 'Log out';
+  out.onclick = () => YA.logout();
+  row.appendChild(out); card.appendChild(row);
+  yaAvatar(); YA.autoBoard({ theme: YA_OPTS.theme });
+}
+
 function renderHome(){
   document.title = 'B2 First Adventure 🚀';
   $('#heroSub').textContent = 'Train hard · Rank up · Beat the final boss 🎮'; document.body.classList.add('home');
@@ -208,6 +234,7 @@ function renderHome(){
     ${mapHtml(d)}
     ${badgesHtml(d)}`;
   afterHome();
+  yaHome();
 }
 
 /* ============ DANH SÁCH CÂU HỎI ============ */
@@ -655,8 +682,15 @@ function buildLesson(){
   $('#inName').value = S.name || me.name || ''; $('#inCls').value = S.cls || me.cls || '';
   AV = me.av || AVATARS[Math.floor(Math.random() * AVATARS.length)]; paintAvPick();
   $('#avPick').addEventListener('click', ev => { const b = ev.target.closest('.avb'); if (!b) return;
-    if (b.id === 'avUp'){ $('#avFile').click(); return; } AV = b.dataset.av; paintAvPick(); });
+    if (b.id === 'avUp'){ $('#avFile').click(); return; } AV = b.dataset.av; paintAvPick(); yaAvatar(); });
   $('#avFile').addEventListener('change', ev => loadAvatarFile(ev.target.files[0], d => { AV = d; paintAvPick(); }));
+  if (YA && YA.me()){ // đã đăng nhập: tên + lớp theo tài khoản, ẩn 2 ô gõ
+    const m = YA.me();
+    $('#inName').value = m.fullName || m.name; $('#inCls').value = m.cls || '-';
+    ['inName', 'inCls'].forEach(id => { $('#' + id).closest('.field').hidden = true; });
+    $('#start h2').textContent = `👋 Hi ${m.name}!`;
+    $('#start p.muted').innerHTML = 'Chọn avatar rồi bấm <b>Start</b>.';
+  }
   $('#startBtn').addEventListener('click', onStart);
   ['inName', 'inCls'].forEach(id => $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') onStart(); }));
 }
@@ -669,14 +703,14 @@ function onStart(){
   $('#startErr').textContent = '';
   S.name = n.slice(0, 80); S.cls = c.slice(0, 30);
   if (!S.startedAt) S.startedAt = new Date().toISOString();
-  save(); lsSet(ME_KEY, { name: S.name, cls: S.cls, av: AV });
+  save(); lsSet(ME_KEY, { name: S.name, cls: S.cls, av: AV }); yaAvatar();
   showWork(); window.scrollTo({ top: 0 });
 }
 function renderWho(){
   const when = S.phase === 'done' ? (S.r2 || S.r1).at : null;
   $('#whoBar').innerHTML = `<span class="whoname">${avHtml(AV || (lsGet(ME_KEY) || {}).av)} <b>${esc(S.name)}</b> · Class <b>${esc(S.cls)}</b></span>` +
     (when ? `<span class="muted small">Submitted ${new Date(when).toLocaleString('vi-VN')}</span>`
-      : S.phase === 'work' ? '<button class="linkbtn" type="button" id="editName">Sửa tên / lớp</button>' : '');
+      : S.phase === 'work' && !YA ? '<button class="linkbtn" type="button" id="editName">Sửa tên / lớp</button>' : '');
   const b = $('#editName'); if (b) b.onclick = () => { $('#work').hidden = true; $('#bar').hidden = true; $('#start').hidden = false; $('#inName').focus(); };
 }
 function showWork(){ $('#start').hidden = true; $('#work').hidden = false; $('#bar').hidden = false; renderWho(); progress(); }
@@ -1100,8 +1134,10 @@ function payload2(){
   });
 }
 async function post(p){
+  const tk = window.YumiAuth && YumiAuth.token(); if (tk) p.token = tk; // đã đăng nhập → máy chủ ghi đúng tên + tính XP
   const r = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(p) });
   const j = await r.json();
+  if (!j.ok && j.auth && window.YumiAuth){ await YumiAuth.authFailed(YA_OPTS); return post(p); } // hết phiên → đăng nhập lại rồi gửi lại
   if (!j.ok) throw new Error(j.error || 'máy chủ báo lỗi');
 }
 let sending = false;
@@ -1135,6 +1171,8 @@ window.addEventListener('focus', comeBack);
 
 /* ============ KHỞI ĐỘNG ============ */
 function boot(){
+  if (YA && !YA.me()){ YA.require(YA_OPTS).then(() => { yaSync(); boot(); }); return; } // bắt đăng nhập trước
+  yaSync();
   if (!LESSON){
     $('#bar').hidden = true;
     if (WEEK_NO) { $('#app').innerHTML = '<div class="card">🔒 Bài này chưa mở. <a href="./">← Quay lại danh sách bài</a></div>'; return; }
