@@ -20,7 +20,7 @@
      box = khung từ (~ = từ đã dùng ở ví dụ) · only = chỉ chấp nhận từ trong khung · sents = câu A–G (Reading Part 6)
      track = audio trong audio/ · img = ảnh trong img/ · tip = mẹo làm bài
    ===================================================================== */
-const OPEN_WEEK = 1;
+const OPEN_WEEK = 2;
 
 // Máy chủ nhận bài (Code.gs dùng chung với các trang BTVN khác)
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAom9bBpL0ms0VD7_bz5w691011llkFzttYSjKDyRyMCjLLeUZ4EZGGJLtLMFWuiV4sA/exec';
