@@ -83,6 +83,11 @@ const toks = t => Array.from(String(t || '').matchAll(TOK)).map(parseTok);
 const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 const nrm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’‘`]/g, "'")
   .replace(/[–—−]/g, '-').replace(/[.,!?;:"]+/g, ' ').replace(/\s+/g, ' ').trim();
+// Bài dịch (trans: true): coi viết tắt = viết đầy đủ (they're = they are, isn't = is not…)
+const nrmT = s => nrm(String(s || '').replace(/[’‘`]/g, "'")
+  .replace(/\bcan't\b/gi, 'can not').replace(/\bcannot\b/gi, 'can not').replace(/\bwon't\b/gi, 'will not').replace(/\bshan't\b/gi, 'shall not')
+  .replace(/n't\b/gi, ' not').replace(/'re\b/gi, ' are').replace(/'m\b/gi, ' am').replace(/'ll\b/gi, ' will').replace(/'ve\b/gi, ' have')
+  .replace(/'s\b(?=\s+(used|getting|going|not|always|very|so|too|a|an|the|been|never|still)\b)/gi, ' is'));
 const vowelStart = w => /^[aeiou]/i.test(w) && !/^(uni|use|eu|one)/i.test(w);
 function lev(a, b){
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
@@ -283,6 +288,7 @@ const tokText = tok => tok.kind === 'ch' ? tok.correct.map(i => tok.opts[i]).joi
 const correctText = q => { const c = tokText(q.tok); return q.tok.kind === 'ch' ? unv(c).replace(/^–$/, '– (không mạo từ)') : c; };
 // Câu hỏi dạng chữ (cho mail): chỗ đang hỏi = ___ hoặc (lựa chọn), chỗ khác = …
 function qText(q){
+  if (q.it.vi) return 'Dịch: ' + q.it.vi;
   const e = q.e, lines = String(q.it.t).split(/<br\s*\/?>/i);
   let i = -1, pick = '';
   const marked = lines.map(line => line.replace(TOK, m0 => {
@@ -446,6 +452,8 @@ const keysOf = (e, it) => QS.filter(q => q.e === e && q.it.n === it.n).map(q => 
 const fixBox = (e, it) => `<div class="fix" data-fix="${e.id}-${it.n}"></div>`;
 
 const exNo = e => LESSON.ex.indexOf(e) + 1;
+// Ô Grammar: mặc định ở đầu bài; grammarAfter: N = đặt sau bài tập thứ N (vd. sau phần nghe mở đầu)
+const gramBox = () => `<details class="gram" open><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammarImg ? aiImg(LESSON.grammarImg) : ''}${LESSON.grammar}</div></details>`;
 function exHead(e){
   const ws = [];
   JSON.stringify(e.examples || []).concat(JSON.stringify(e.items || [])).replace(/\(\(([^)]*)\)\)/g, (_, inner) => {
@@ -566,7 +574,7 @@ function exList(e){
   const nx = (e.examples || []).length, pic = j => e.pics && e.pics[j] ? `<img class="itpic" src="img/ai/${e.pics[j]}.jpg" alt="" loading="lazy">` : '';
   const ex = (e.examples || []).map((t, j) => `<div class="it example${e.conv ? ' conv' : ''}${e.pics ? ' haspic' : ''}"><span class="cn">▶</span>${pic(j)}<div class="itb">${renderT(t, null, true)}${e.tick ? tickBtns(e.id + '-ex' + (j || '')) : ''}</div></div>`).join('');
   return `<div class="items">${ex}${itemsOfEx(e).map(it => `<div class="it${e.conv ? ' conv' : ''}${e.pics ? ' haspic' : ''}" data-item="${e.id}-${it.n}">
-      <span class="cn">${it.n}</span>${pic(nx + Number(it.n) - 1)}<div class="itb">${renderT(it.t, keysOf(e, it))}${it.v ? ` <span class="vb">(${vt(it.v)})</span>` : ''}${e.tick ? tickBtns(e.id + '-' + it.n) : ''}${fixBox(e, it)}</div></div>`).join('')}</div>
+      <span class="cn">${it.n}</span>${pic(nx + Number(it.n) - 1)}<div class="itb">${it.vi ? `<div class="tvi">${esc(it.vi)}</div>${it.ph ? `<div class="tph">💬 ${it.ph}</div>` : ''}` : ''}${renderT(it.t, keysOf(e, it))}${it.v ? ` <span class="vb">(${vt(it.v)})</span>` : ''}${e.tick ? tickBtns(e.id + '-' + it.n) : ''}${fixBox(e, it)}</div></div>`).join('')}</div>
     ${e.readAloud ? `<div class="recbox"><h3>🎙 Read aloud</h3><p class="how">Now read all the sentences above aloud (with your answers) and record yourself.</p>
       <div class="sq" id="sq-${e.id}-ra"></div></div>` : ''}`;
 }
@@ -638,9 +646,9 @@ function buildLesson(){
         <div id="afterWords"></div>`
         : `<h2>📘 ${esc(LESSON.title)}</h2>
         <div class="note">💡 Chưa biết từ nào thì chạm vào từ màu vàng để xem nghĩa.</div>`}
-        ${LESSON.grammar ? `<details class="gram" open><summary>📘 Grammar: ${esc(LESSON.title)}</summary><div class="gbody">${LESSON.grammarImg ? aiImg(LESSON.grammarImg) : ''}${LESSON.grammar}</div></details>` : ''}
+        ${LESSON.grammar && !LESSON.grammarAfter ? gramBox() : ''}
       </section>
-      ${LESSON.ex.map(e => `${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}" id="ex${e.id}">${exHead(e)}${e.drag || e.side
+      ${LESSON.ex.map((e, i) => `${LESSON.grammarAfter && i === LESSON.grammarAfter ? `<section class="card gramcard">${gramBox()}</section>` : ''}${e.part ? `<h2 class="part">${e.part}</h2>` : ''}<section class="card ex${e.stack ? ' stack' : ''}${e.trans ? ' trans' : ''}" id="ex${e.id}">${exHead(e)}${e.drag || e.side
         ? `<div class="dz${e.sents ? ' dzs' : ''}${e.side ? ' dzw' : ''}"><div class="dz-work">${exBody(e)}</div><aside class="dz-side">${e.drag ? bankOf(e) : sideBox(e)}</aside></div>` : exBody(e)}</section>`).join('')}
     </div>`;
 
@@ -762,7 +770,7 @@ function isOk(q){
   const v = S.a[q.k];
   if (q.tok.kind === 'ch'){ const a = (Array.isArray(v) ? v : []).slice().sort((x, y) => x - y); return a.length === q.tok.need && a.every((x, i) => x === q.tok.correct[i]); }
   if (q.tok.kind === 'noun') return nounCheck(v, q.tok.sg, q.tok.pl).ok;
-  const y = nrm(v); return !!y && q.tok.alts.some(a => nrm(a) === y);
+  const f = q.e.trans ? nrmT : nrm, y = f(v); return !!y && q.tok.alts.some(a => f(a) === y);
 }
 function gradeNow(){
   const items = {};

@@ -39,3 +39,9 @@ Dùng chung máy chủ Code.gs với các trang BTVN (unit `B2 First`): lần 1 
   - Mỗi quest viết như 1 bài, thêm `id`, `week`, `video` (ID file Google Drive, file phải để "Bất kỳ ai có đường liên kết"), `mins`.
   - Link `?sq=<id>`; cô xem trước: `&preview`.
 - Kết quả Revenge (mỗi ngày), Boss (trận đầu) và Side quest đều gửi mail cho cô như bài tập và được tính XP.
+
+## Tuỳ chọn mới (tuần 3)
+- `grammarAfter: N` (bài học): đặt ô Grammar sau bài tập thứ N, ví dụ sau phần nghe mở đầu. Không có thì ô Grammar ở đầu bài.
+- `trans: true` (bài tập): bài dịch Việt → Anh.
+  - Mỗi câu có `vi` (câu tiếng Việt), `ph` (cụm từ khó cho sẵn) và `t: '[[đáp án 1|đáp án 2|…]]'`.
+  - Khi chấm, viết tắt = viết đầy đủ (they're = they are…), bỏ qua dấu câu. Nên ghi nhiều cách dịch đúng.

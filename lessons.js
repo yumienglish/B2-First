@@ -151,6 +151,28 @@ const VOCAB = {
   'apparently':     { w: 'apparently', ipa: '/əˈpærəntli/', vi: 'nghe nói là, hình như' },
   'rumours':        { w: 'rumours', ipa: '/ˈruːməz/', vi: 'tin đồn' },
   'plentiful':      { w: 'plentiful', ipa: '/ˈplentɪfl/', vi: 'nhiều, dồi dào' },
+
+  /* Unit 2 – Past tenses */
+  'coach':          { w: 'coach', ipa: '/kəʊtʃ/', vi: 'xe khách đường dài' },
+  'revision':       { w: 'revision', ipa: '/rɪˈvɪʒn/', vi: 'việc ôn bài (trước kỳ thi)' },
+  'queue':          { w: 'queue', ipa: '/kjuː/', vi: 'xếp hàng (chờ đến lượt)' },
+  'autograph':      { w: 'autograph', ipa: '/ˈɔːtəɡrɑːf/', vi: 'chữ ký (của người nổi tiếng)' },
+  'embarrass':      { w: 'embarrass', ipa: '/ɪmˈbærəs/', vi: 'làm ai ngượng, xấu hổ' },
+  'worry':          { w: 'worry', ipa: '/ˈwʌri/', vi: 'lo lắng' },
+  'diary':          { w: 'diary', ipa: '/ˈdaɪəri/', vi: 'nhật ký' },
+  'application form': { w: 'application form', ipa: '/ˌæplɪˈkeɪʃn fɔːm/', vi: 'mẫu đơn đăng ký' },
+  'receptionist':   { w: 'receptionist', ipa: '/rɪˈsepʃənɪst/', vi: 'nhân viên lễ tân' },
+  'crash pc':       { w: 'crash', ipa: '/kræʃ/', vi: '(máy tính) bị treo, bị sập' },
+  'depressed':      { w: 'depressed', ipa: '/dɪˈprest/', vi: 'chán nản, buồn bã' },
+  'pay rise':       { w: 'pay rise', ipa: '/ˈpeɪ raɪz/', vi: 'sự tăng lương' },
+  'independent':    { w: 'independent', ipa: '/ˌɪndɪˈpendənt/', vi: 'tự lập, không dựa vào người khác' },
+  'ground floor':   { w: 'ground floor', ipa: '/ˌɡraʊnd ˈflɔː/', vi: 'tầng trệt' },
+  'thieves':        { w: 'thieves', ipa: '/θiːvz/', vi: 'những kẻ trộm (số ít: thief)' },
+  'break into':     { w: 'break into', ipa: '/ˌbreɪk ˈɪntuː/', vi: 'đột nhập (vào nhà, xe…)' },
+  'tune':           { w: 'tune', ipa: '/tjuːn/', vi: 'giai điệu' },
+  'hit songs':      { w: 'hit songs', ipa: '/ˈhɪt sɒŋz/', vi: 'những bài hát ăn khách' },
+  'ancient':        { w: 'ancient', ipa: '/ˈeɪnʃənt/', vi: 'rất cũ, cổ' },
+  'amazed':         { w: 'amazed', ipa: '/əˈmeɪzd/', vi: 'kinh ngạc, rất ngạc nhiên' },
 };
 
 /* ---------- BÀI HỌC THEO TUẦN ---------- */
@@ -355,6 +377,151 @@ const LESSONS = {
             h: 'Câu trước tả những thung lũng “silent”. Câu trống tiếp tục ý đó.' },
           { t: 'On the final day I said goodbye and drove out of the park. The closest I had come to seeing a puma may have been a {{fleeting}} {{glimpse}} but I realised it mattered little. For my search had made me study every {{crag}} and cave, bush and {{boulder}} in this vast, ultimately unknowable land all the more intensely.' },
         ] },
+    ],
+  }],
+
+  /* ===================== TUẦN 3 – Grammar Unit 2 ===================== */
+  3: [{
+    kind: 'Grammar', icon: '📘', code: 'Unit 2', title: 'Past tenses',
+    copy: false,
+    newWords: ['coach', 'revision', 'queue', 'autograph', 'embarrass', 'diary', 'application form', 'receptionist', 'crash pc',
+      'depressed', 'pay rise', 'independent', 'ground floor', 'thieves', 'break into', 'tune', 'hit songs', 'ancient', 'amazed'],
+    // Ô Grammar đặt SAU 2 bài nghe mở đầu (grammarAfter: 2). Ví dụ KHÔNG trùng câu trong bài tập.
+    grammarAfter: 2,
+    grammar: `
+      <h4>1. Quá khứ đơn (Past simple)</h4>
+      <p class="fml">(+) V-ed / V2 &nbsp;·&nbsp; (−) didn’t + V &nbsp;·&nbsp; (?) Did … + V?</p>
+      <ul>
+        <li>Việc đã xong trong quá khứ: <i>We <b>visited</b> Da Nang last summer.</i></li>
+        <li>Chuỗi việc xảy ra nối tiếp: <i>She <b>opened</b> the door, <b>looked</b> around and <b>smiled</b>.</i></li>
+        <li>Tình huống lâu dài / việc lặp lại trong quá khứ: <i>He <b>lived</b> in Hue for ten years.</i></li>
+      </ul>
+      <h4>2. Quá khứ tiếp diễn (Past continuous)</h4>
+      <p class="fml">(+) was / were + V-ing &nbsp;·&nbsp; (−) wasn’t / weren’t + V-ing &nbsp;·&nbsp; (?) Was / Were … + V-ing?</p>
+      <ul>
+        <li>Việc đang diễn ra thì có việc khác xen vào (<i>when / while</i>): <i>I <b>was cooking</b> when the lights <b>went</b> out.</i></li>
+        <li>Hai việc diễn ra cùng lúc: <i>Mum <b>was reading</b> while Dad <b>was watching</b> TV.</i></li>
+        <li><b>always</b> + V-ing = phàn nàn: <i>My little brother <b>was always taking</b> my pens!</i></li>
+        <li>Dự định không thành (<i>plan, hope, think of</i>): <i>We <b>were planning</b> a picnic, but it rained.</i></li>
+        <li>⚠ Động từ trạng thái (<i>know, want, like, believe…</i>) không dùng -ing: <i>I <b>knew</b> the answer.</i> (không nói <s>was knowing</s>)</li>
+      </ul>
+      <h4>3. used to / would + V: thói quen trong quá khứ, bây giờ KHÔNG còn</h4>
+      <p class="fml">(+) used to + V &nbsp;·&nbsp; (−) didn’t use to + V &nbsp;·&nbsp; (?) Did … use to + V?</p>
+      <ul>
+        <li><i>I <b>used to play</b> football every afternoon.</i> (bây giờ không chơi nữa)</li>
+        <li><b>would</b> + V chỉ dùng cho <b>hành động</b> lặp lại: <i>On Sundays, Grandpa <b>would take</b> us fishing.</i></li>
+        <li>Trạng thái (<i>be, have, like…</i>) chỉ dùng <b>used to</b>: <i>She <b>used to have</b> long hair.</i> (không nói <s>would have</s>)</li>
+      </ul>
+      <h4>4. be / get used to + V-ing / danh từ (khác với used to + V!)</h4>
+      <ul>
+        <li><b>be used to</b> = đã quen: <i>I<b>’m used to</b> getting up early.</i></li>
+        <li><b>get used to</b> = dần dần quen: <i>You’ll soon <b>get used to</b> the noise.</i></li>
+        <li>Dùng được ở mọi thì: <i>is used to · was used to · will get used to · got used to…</i></li>
+        <li>So sánh: <i>I <b>used to live</b> in Hanoi.</i> (trước đây sống, giờ không) ≠ <i>I<b>’m used to living</b> in Hanoi.</i> (đã quen sống ở đó)</li>
+      </ul>`,
+    ex: [
+      /* Bài 1 (Context listening 1, không có bước đoán) – ai đã làm việc gì */
+      { id: 'l1', type: 'list', track: 'u2-listening',
+        title: 'Listening: Jack’s day in London',
+        how: 'Listen to Jack talking to his grandmother. Who did these things? Choose J (Jack), M (Jack’s mother) or G (Gran).',
+        examples: [ 'go to London ((*J/M/G))' ],
+        items: [
+          { t: 'see a famous footballer ((*J/M/G))', h: 'Nghe đoạn xếp hàng mua vé xem phim.' },
+          { t: 'go up to town alone ((J/M/*G))', h: 'Nghe đoạn bà kể chuyện ngày xưa: “When I was your age…”.' },
+          { t: '{{worry}} about school work ((J/*M/G))', h: 'Nghe câu cuối của bà: “But don’t tell your mother…”.' },
+          { t: 'go to a club ((*J/M/G))', h: 'Nghe câu cuối của Jack, sau khi xem phim.' },
+        ] },
+
+      /* Bài 2 (Context listening 4) – nghe lại, điền đúng từ người nói dùng */
+      { id: 'l4', type: 'list', track: 'u2-listening',
+        title: 'Listen again: complete the sentences',
+        how: 'Listen again and complete the sentences with the words that the speakers use.',
+        items: [
+          { t: 'We did some {{revision}} for our exams while we [[were travelling|were traveling]].', h: 'Một việc kéo dài (đi đường) đang diễn ra trong lúc làm việc khác.' },
+          { t: 'When we [[were queuing|were queueing]] for the cinema, we saw a really famous footballer.', h: 'Việc đang diễn ra thì gặp cầu thủ (việc xen vào). Động từ: queue.' },
+          { t: 'He [[was buying]] a burger and all the crowds [[were walking]] past but nobody noticed him except me.',
+            h: ['Hai việc diễn ra cùng lúc. Chủ ngữ “he”.', 'Hai việc diễn ra cùng lúc. Chủ ngữ “the crowds” số nhiều.'] },
+        ] },
+
+      /* Bài 3 (Grammar ex 2) – quá khứ đơn / quá khứ tiếp diễn */
+      { id: 'g2', type: 'list',
+        title: 'Past simple or past continuous?',
+        how: 'Fill in the gaps with the past simple or past continuous form of the verbs in brackets.',
+        examples: [ 'My parents [[got]] (get) to know each other when they [[were studying]] (study) at university.' ],
+        items: [
+          { t: 'Doctor Fisher [[travelled|traveled]] (travel) widely as a young man and [[always kept]] (always keep) a {{diary}}.',
+            h: ['Việc đã xong trong quá khứ (khi còn trẻ).', 'Thói quen trong quá khứ, không phải phàn nàn. Nhớ vị trí của “always”.'] },
+          { t: 'I [[saw]] (see) my brother and his friend when I [[was waiting]] (wait) for the bus, but they [[didn’t see|did not see]] (not see) me.',
+            h: ['Việc ngắn xen vào.', 'Việc đang diễn ra thì có việc khác xen vào.', 'Câu phủ định của việc ngắn.'] },
+          { t: 'Lily [[filled]] (fill) in the {{application form}} and [[gave]] (give) it to the {{receptionist}}.',
+            h: ['Chuỗi việc nối tiếp nhau.', 'Việc tiếp theo trong chuỗi; động từ bất quy tắc.'] },
+          { t: 'While I [[was working]] (work) in Rome, I [[met]] (meet) a girl who [[looked]] (look) just like your sister.',
+            h: ['“While” + việc kéo dài.', 'Việc ngắn xen vào; động từ bất quy tắc.', '“look like” (trông giống) là động từ trạng thái.'] },
+          { t: 'Simon [[bought]] (buy) a new laptop because his old one [[was always crashing]] (always crash).',
+            h: ['Việc đã xong; động từ bất quy tắc.', '“always” + ý phàn nàn: xem mục 2 trong ô Grammar.'] },
+          { t: 'I [[missed]] (miss) your text because my phone [[was charging]] (charge) in another room.',
+            h: ['Việc đã xong.', 'Việc đang diễn ra lúc tin nhắn đến.'] },
+          { t: 'Anna’s feeling {{depressed}} because she [[was hoping]] (hope) for a {{pay rise}} last week, but she [[didn’t get|did not get]] (not get) one.',
+            h: ['Mong đợi nhưng không thành: xem mục 2 trong ô Grammar.', 'Câu phủ định, việc đã xong.'] },
+        ] },
+
+      /* Bài 4 (Grammar ex 3) – chọn dạng đúng trong đoạn văn */
+      { id: 'g3', type: 'text',
+        title: 'My granny',
+        how: 'Choose the correct form of the verbs in this text.',
+        paras: [
+          { t: 'My granny is 93 and she’s come to live with us at our house. We’re all pleased because we love having her near us. She’s a very {{independent}} person and until this year, she <span class="exv">refused</span> to move to the flat on our {{ground floor}}. But last month she suddenly ((*changed/was changing)) her mind and I ((*asked/would ask)) her why. She explained that for years, nobody in her village ((*would lock/was locking)) their front doors and the place ((*used to feel/would feel)) safe, but last month she ((*met/was meeting)) a neighbour in the street when she ((*was walking/would walk)) home from the shops and ((*heard/was hearing)) some bad news. {{thieves|Thieves}} ((*were breaking/got used to breaking)) into people’s houses while they ((*were sitting/would sit)) in their back gardens.',
+            h: ['Một việc ngắn, đã xong (last month).', 'Việc ngắn, đã xong.', 'Thói quen nhiều năm trước, giờ không còn: “would” + hành động.', '“feel safe” là trạng thái: would không dùng được.', 'Việc ngắn xen vào.', 'Việc đang diễn ra thì gặp hàng xóm.', 'Việc ngắn, nối tiếp.', 'Việc đang diễn ra lúc đó (không phải “quen dần”).', 'Hai việc diễn ra cùng lúc.'] },
+          { t: 'She ((*realised/was realising)) that she ((wasn’t wanting/*didn’t want)) to live alone any more. She ((*isn’t used/didn’t use)) to being in the town yet, but it’s not as difficult as she ((was thinking/*thought)) it might be, and she loves seeing us more often.',
+            h: ['“realise” là động từ trạng thái.', '“want” là động từ trạng thái.', 'Sau đó là “to being” (V-ing): be used to = quen với. Hiện tại (yet).', '“think” = cho rằng (ý kiến) → không dùng -ing.'] },
+        ] },
+
+      /* Bài 5 (Grammar ex 4 → dịch Việt – Anh, có gợi ý cụm từ khó) */
+      { id: 'tr4', type: 'list', trans: true,
+        title: 'Translate: be / get used to',
+        how: 'Translate the sentences into English. Use be used to or get used to + -ing or a noun. The 💬 phrases will help you.',
+        tip: 'Dịch cả câu sang tiếng Anh. Dùng <b>be used to</b> (đã quen) hoặc <b>get used to</b> (dần quen) + V-ing hoặc danh từ.',
+        examples: [ '<div class="tvi">Sáng nay Rita rất mệt. Cô ấy không quen đi ngủ muộn.</div><span class="exv">Rita’s very tired this morning. She isn’t used to going to bed late.</span>' ],
+        items: [
+          { vi: 'Đừng lo cho bọn trẻ: chúng đã quen đi học bằng xe buýt rồi.', ph: '<i>đi học bằng xe buýt</i> = go to school by bus',
+            t: '[[Don’t worry about the children: they’re used to going to school by bus.|Don’t worry about the children: they’re already used to going to school by bus.|Don’t worry about the kids: they’re used to going to school by bus.|Don’t worry about the children: they’ve got used to going to school by bus.|Don’t worry about the children: they’re used to taking the bus to school.]]',
+            h: '“đã quen” = be used to + V-ing. Chủ ngữ “they”.' },
+          { vi: 'Sếp mới của tôi quen ra lệnh chứ không quen nhận lệnh.', ph: '<i>ra lệnh</i> = give orders · <i>nhận lệnh</i> = receive orders',
+            t: '[[My new boss is used to giving orders, not receiving them.|My new boss is used to giving orders, not receiving orders.|My new boss is used to giving orders, not to receiving them.|My new boss is used to giving orders, but not receiving them.|My new boss is used to giving orders and not receiving them.|My new boss is used to giving orders, not taking them.]]',
+            h: 'be used to + V-ing (give → giving). Chủ ngữ số ít.' },
+          { vi: 'Cô ấy không quen uống cà phê rất đặc và nó đã làm cô ấy bị ốm.', ph: '<i>cà phê rất đặc</i> = very strong coffee · <i>làm ai bị ốm</i> = make somebody ill',
+            t: '[[She wasn’t used to drinking very strong coffee and it made her ill.|She wasn’t used to drinking very strong coffee, so it made her ill.|She wasn’t used to drinking very strong coffee and it made her sick.|She wasn’t used to drinking very strong coffee, so she got ill.|She wasn’t used to drinking very strong coffee and she got ill.|She wasn’t used to drinking very strong coffee and she became ill.]]',
+            h: 'Chuyện đã xảy ra → be ở quá khứ. Câu phủ định + V-ing.' },
+          { vi: 'Bạn đã quen với khí hậu của chúng tôi chưa, hay bạn vẫn nhớ ánh nắng?', ph: '<i>khí hậu</i> = climate · <i>nhớ ánh nắng</i> = miss the sunshine',
+            t: '[[Are you getting used to our climate or do you still miss the sunshine?|Have you got used to our climate or do you still miss the sunshine?|Have you gotten used to our climate or do you still miss the sunshine?|Are you used to our climate or do you still miss the sunshine?|Have you got used to our climate yet or do you still miss the sunshine?|Are you used to our climate yet or do you still miss the sunshine?|Are you getting used to our climate or do you still miss the sun?|Have you got used to our climate or do you still miss the sun?]]',
+            h: 'Câu hỏi: đưa trợ động từ lên trước “you”. get used to + danh từ (our climate).' },
+          { vi: 'Trước đây tôi chưa bao giờ ở một khách sạn đắt tiền như thế, nhưng tôi đã nhanh chóng quen với nó.', ph: '<i>một khách sạn đắt tiền như thế</i> = such an expensive hotel · <i>nhanh chóng</i> = soon / quickly',
+            t: '[[I had never stayed in such an expensive hotel before, but I soon got used to it.|I’d never stayed in such an expensive hotel before, but I soon got used to it.|I had never stayed in such an expensive hotel before, but I quickly got used to it.|I’d never stayed in such an expensive hotel before, but I quickly got used to it.|I never stayed in such an expensive hotel before, but I soon got used to it.|I had never stayed in a hotel as expensive as that before, but I soon got used to it.]]',
+            h: '“dần quen” ở quá khứ = got used to + it.' },
+        ] },
+
+      /* Bài 6 – Exam practice: Reading and Use of English Part 1 */
+      { id: 'rue1', type: 'text', part: 'Exam practice',
+        title: 'Reading and Use of English Part 1: A musician is discovered',
+        how: 'Read the text and choose the answer (A, B, C or D) which best fits each gap. There is an example at the beginning (0).',
+        tip: 'If you are unsure, first cross out the answers that are wrong.',
+        paras: [
+          { t: 'When Jimmy Yates was a small boy, his family <span class="exv">spent</span> their holidays on his grandfather’s farm. This was in a valley ((*surrounded/closed/held/circled)) by mountains. It was during one of these visits that Jimmy’s ((talent/gift/*ability/skill)) to remember a {{tune}} led to the suggestion that the boy should ((*take up/start up/pick up/join up)) a musical instrument.',
+            h: ['Thung lũng được núi … (bao quanh).', 'Danh từ đi với “to + V”: khả năng làm gì.', 'Bắt đầu học (một nhạc cụ, một môn thể thao).'] },
+          { t: 'One evening a discussion ((happened/came/entered/*arose)) among the adults about the differences between two {{hit songs}}. His father tried to prove the ((comparison/closeness/likeness/*similarity)) of the two tunes by playing them, not very well, on his guitar. No one thought that Jimmy, who was only five, was listening, but suddenly he made his ((path/*way/route/line)) to the {{ancient}} piano which stood in the corner and played first one of the tunes and then the other. The family was {{amazed}} ((so/although/when/*as)) no one had heard him play any music before. In this way, Jimmy’s musical ((work/living/*career/study)) began.',
+            h: ['Một cuộc tranh luận … (nảy sinh). Động từ đi với “discussion / problem”.', 'Bố muốn chứng minh hai bài giống nhau ở điểm nào.', 'make one’s … to = đi tới đâu.', 'Liên từ chỉ lý do (= because).', 'Con đường nghề nghiệp lâu dài.'] },
+        ] },
+
+      /* Bài 7 – Grammar focus task: động từ bất quy tắc */
+      { id: 'gft', type: 'list',
+        title: 'Grammar focus: irregular past forms',
+        how: 'Write the past simple form of these verbs from the exam text.',
+        examples: [ 'begin → [[began]]' ],
+        items: [
+          { t: 'arise → [[arose]]' }, { t: 'come → [[came]]' }, { t: 'go → [[went]]' }, { t: 'hear → [[heard]]' },
+          { t: 'hold → [[held]]' }, { t: 'lead → [[led]]' }, { t: 'make → [[made]]' }, { t: 'spend → [[spent]]' },
+          { t: 'stand → [[stood]]' }, { t: 'take → [[took]]' }, { t: 'think → [[thought]]' },
+        ].map(x => Object.assign(x, { h: 'Động từ bất quy tắc: xem cột 2 trong bảng động từ bất quy tắc.' })) },
     ],
   }],
 };

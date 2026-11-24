@@ -88,6 +88,7 @@ const bossOpen = B => OPEN_WEEK >= B.after || (PREVIEW && QP.get('boss') === B.i
 
 /* ---------- Hiển thị 1 câu trong trận ---------- */
 function battleSentence(q){
+  if (q.it.vi) return `<div class="tvi">${esc(q.it.vi)}</div>${q.it.ph ? `<div class="tph">💬 ${q.it.ph}</div>` : ''}<span class="bblank">_______</span>`;
   let i = -1;
   let s = String(q.it.t).replace(TOK, m0 => {
     i++; const tk = parseTok([...m0.matchAll(TOK)][0]);
@@ -114,7 +115,8 @@ function battleAnswers(q){
     const pick = shuffle(chips.filter(c => c.w === right).concat(shuffle(chips.filter(c => c.w !== right)).slice(0, 3)));
     return { type: 'opt', opts: pick.map(c => ({ label: e.sents ? c.w + '. ' + plain(c.s) : c.w, ok: c.w === right })) };
   }
-  return { type: 'type', check: v => t.kind === 'noun' ? nounCheck(v, t.sg, t.pl).ok : t.alts.some(a => nrm(a) === nrm(v)),
+  const f = e.trans ? nrmT : nrm;
+  return { type: 'type', check: v => t.kind === 'noun' ? nounCheck(v, t.sg, t.pl).ok : t.alts.some(a => f(a) === f(v)),
     answer: t.kind === 'noun' ? tokText(t) : t.alts[0] };
 }
 const correctOf = q => q.tok.kind === 'ch' ? q.tok.correct.map(i => plain(unv(q.tok.opts[i]))).join(' + ') : q.tok.kind === 'noun' ? tokText(q.tok) : q.tok.alts[0];

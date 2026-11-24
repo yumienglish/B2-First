@@ -832,3 +832,17 @@ body.rk-5 .av,body.rk-6 .av{animation:rkglow 2s ease-in-out infinite}
 
 /* Nhân vật tủ đồ (avatar.js) thay avatar */
 .avchar{overflow:hidden;padding:0;background:radial-gradient(circle,#fff,#e2dcff)}.avchar .yav{width:100%}
+
+/* ô Grammar giữa bài, công thức, bài dịch Việt → Anh */
+.gramcard{padding:12px 14px} .gramcard .gram{margin-top:0}
+.gbody .fml{display:inline-block;margin:2px 0 6px;padding:4px 12px;border-radius:8px;background:#e9f6ff;border:1px solid #b9dcf5;color:#0d4a7a;font-weight:800;font-family:Rajdhani,Nunito,sans-serif;letter-spacing:.02em;font-size:16px}
+.tvi{font-weight:800;color:#1d2340;margin-bottom:2px}
+.tvi{line-height:1.5;margin-top:4px}
+.tph{font-size:14.5px;color:#5a6488;margin-bottom:6px}
+.tph i{color:#1aa6c4;font-style:normal;font-weight:700}
+.ex.trans .itb{flex:1;min-width:0}
+.ex.trans input.txt.gap,.ex.trans .itb input.txt{width:100%!important;max-width:none;text-align:left;font-size:17px}
+.ex.trans .example .exv{display:inline-block;margin-top:2px}
+.bt .tvi{color:#fff} .bt .tph{color:#9ba5d8}
+.ex.trans .gw{display:block;width:100%;margin-top:4px}
+.tph{line-height:1.45}
