@@ -142,6 +142,18 @@ const LESSON = SQ_ID ? (SIDEQUESTS.find(x => x.id === SQ_ID && (x.week <= OPEN_W
 const myKey = () => SQ_ID ? 'b2-sq-' + SQ_ID : storeKey(WEEK_NO, PART_NO);
 const ME_KEY = 'b2-me';
 const storeKey = (w, b) => 'b2-w' + w + '-' + (b || 1);
+// 24/11: Vocabulary Unit 25 chuyển từ tuần 2 về tuần 1 (bài 2); tuần 2 = Grammar Unit 2.
+// Bài Vocabulary em đã làm (đang lưu ở b2-w2-1) → chuyển sang b2-w1-2, không mất bài.
+const VOCAB25_KEYS = /^(v12|v13|v14|v31|rue6)-/;
+function migrateB2(){
+  const old = lsGet('b2-w2-1'); if (!old) return;
+  const ks = Object.keys(old.a || {}).concat(Object.keys((old.r1 && old.r1.items) || {}));
+  if (!ks.some(k => VOCAB25_KEYS.test(k))) return;
+  const cur = lsGet('b2-w1-2');
+  const better = !cur || !cur.startedAt || (old.phase === 'done' && cur.phase !== 'done') || (old.phase === cur.phase && String(old.startedAt) > String(cur.startedAt));
+  if (better) lsSet('b2-w1-2', old);
+  try { localStorage.removeItem('b2-w2-1'); } catch (e) {}
+}
 // Từ chép vở của 1 bài: newWords + newWordsAfter (từ là đáp án, chỉ hiện sau khi nộp xong)
 const wordsOf = (L, done) => (L.newWords || []).concat(done ? L.newWordsAfter || [] : []);
 
@@ -228,6 +240,7 @@ function yaHome(){
 }
 
 function renderHome(){
+  migrateB2();
   document.title = 'B2 First Adventure 🚀';
   $('#heroSub').textContent = 'Train hard · Rank up · Beat the final boss 🎮'; document.body.classList.add('home');
   const me = lsGet(ME_KEY) || {};
@@ -1198,6 +1211,7 @@ window.addEventListener('focus', comeBack);
 function boot(){
   if (YA && !YA.me()){ YA.require(YA_OPTS).then(() => { yaSync(); boot(); }); return; } // bắt đăng nhập trước
   yaSync();
+  migrateB2();
   if (!LESSON){
     $('#bar').hidden = true;
     if (WEEK_NO || SQ_ID) { $('#app').innerHTML = '<div class="card">🔒 Bài này chưa mở. <a href="./">← Quay lại danh sách bài</a></div>'; return; }
@@ -1206,6 +1220,9 @@ function boot(){
   $('#back').hidden = false;
   S = Object.assign(blank(), lsGet(myKey()) || {});
   const redone = applyRedo(myKey()); // mở link làm lại của cô
+  // dữ liệu lưu không thuộc bài này (bài đã đổi tuần) → bắt đầu sạch
+  const own = new Set(LESSON.ex.map(e => e.id));
+  if (Object.keys(S.a || {}).some(k => !own.has(k.replace(/-.*$/, '')))){ migrateB2(); S = blank(); save(); }
   buildLesson();
   if (redone) $('#startErr').insertAdjacentHTML('beforebegin', REDO_MSG);
   $('#submitBtn').addEventListener('click', onSubmit);

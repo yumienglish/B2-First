@@ -3,7 +3,7 @@
    (sách Grammar and Vocabulary for First and First for Schools)
    ---------------------------------------------------------------------
    • OPEN_WEEK: tuần đang mở. LESSONS[tuần] = mảng các bài của tuần (link ?w=tuần&b=số bài), mỗi bài nộp riêng.
-     Hiện tại mỗi tuần 1 bài, xen kẽ Grammar / Vocabulary.
+     Tuần 1 = Grammar Unit 1 + Vocabulary Unit 25 (?w=1&b=1, ?w=1&b=2) · tuần 2 = Grammar Unit 2 (?w=2&b=1).
    • copy: false = ô New words chỉ để học (không bắt chép vở). drag: true = kéo thả / chạm từ trong khung vào chỗ trống.
    • ai / grammarImg / wordsImg = tên hình minh hoạ tạo bằng ChatGPT trong img/ai/<tên>.jpg (chưa có file thì tự ẩn).
      Các bài tuần trước vẫn mở để học sinh xem lại. Cô xem trước bài chưa mở: ?w=2&preview
@@ -20,7 +20,7 @@
      box = khung từ (~ = từ đã dùng ở ví dụ) · only = chỉ chấp nhận từ trong khung · sents = câu A–G (Reading Part 6)
      track = audio trong audio/ · img = ảnh trong img/ · tip = mẹo làm bài
    ===================================================================== */
-const OPEN_WEEK = 2;
+const OPEN_WEEK = 2;            // tuần 2 = Grammar Unit 2 (mở 24/11)
 
 // Máy chủ nhận bài (Code.gs dùng chung với các trang BTVN khác)
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAom9bBpL0ms0VD7_bz5w691011llkFzttYSjKDyRyMCjLLeUZ4EZGGJLtLMFWuiV4sA/exec';
@@ -279,10 +279,8 @@ const LESSONS = {
         ] },
 
     ],
-  }],
-
-  /* ===================== TUẦN 2 – Vocabulary Unit 25 ===================== */
-  2: [{
+  }, {
+  /* ===================== TUẦN 1 · bài 2 – Vocabulary Unit 25 ===================== */
     kind: 'Vocabulary', icon: '🌍', code: 'Unit 25', title: 'Earth, sea and sky',
     // Ô chép vở: CHỈ từ thuộc nội dung chính của bài (địa lý, phong cảnh, khí hậu, thời tiết).
     // Từ khó khác trong bài chỉ highlight. newWordsAfter = từ chính là đáp án → chỉ hiện sau khi nộp xong.
@@ -380,8 +378,8 @@ const LESSONS = {
     ],
   }],
 
-  /* ===================== TUẦN 3 – Grammar Unit 2 ===================== */
-  3: [{
+  /* ===================== TUẦN 2 – Grammar Unit 2 ===================== */
+  2: [{
     kind: 'Grammar', icon: '📘', code: 'Unit 2', title: 'Past tenses',
     copy: false,
     newWords: ['coach', 'revision', 'queue', 'autograph', 'embarrass', 'diary', 'application form', 'receptionist', 'crash pc',
@@ -534,7 +532,7 @@ const LESSONS = {
    after = mở khi OPEN_WEEK >= after (cô xem trước: ?boss=boss1&preview).
    ===================================================================== */
 const BOSSES = [
-  { id: 'boss1', after: 4, name: 'Tense Titan', img: 'boss-1', units: 'Unit 1 · Unit 25',
+  { id: 'boss1', after: 4, name: 'Tense Titan', img: 'boss-1', units: 'Unit 1 · Unit 2 · Unit 25',
     qs: [
       { p: 1, t: 'From the top of the hill we had a breathtaking ((*view/sight/look/scene)) of the whole valley.', h: 'have a … of something = nhìn thấy toàn cảnh.' },
       { p: 1, t: 'The path to the waterfall was very ((*steep/high/tall/sharp)), so we walked slowly.', h: 'Đường dốc đứng, khó đi lên.' },
@@ -544,6 +542,10 @@ const BOSSES = [
       { p: 2, t: 'We [[are]] staying here until Sunday, and then we drive home.', h: 'Kế hoạch / việc tạm thời: hiện tại tiếp diễn.' },
       { p: 2, t: 'Every morning we get up early, but today it is raining, so we [[are|\'re]] playing cards in the tent.', h: 'Việc đang diễn ra lúc này.' },
       { p: 2, t: 'What [[do]] you usually do at the weekend?', h: 'Câu hỏi về thói quen: hiện tại đơn.' },
+      { p: 2, t: 'When I was younger, I [[used]] to spend every summer on my uncle’s farm.', h: 'Thói quen trong quá khứ, bây giờ không còn: … to + V.' },
+      { p: 2, t: 'We [[were]] watching a film when the power suddenly went off.', h: 'Việc đang diễn ra thì bị xen vào. Chủ ngữ “we”.' },
+      { p: 2, t: 'It took me months to get used to [[living|being]] in such a big city.', h: 'get used to + V-ing.' },
+      { p: 2, t: '[[Did]] you use to play any sport at primary school?', h: 'Câu hỏi với used to: trợ động từ ở quá khứ.' },
       { p: 3, base: 'ROCK', t: 'We climbed up a narrow [[rocky]] path to reach the top.', h: 'Cần tính từ đứng trước danh từ “path”.' },
       { p: 3, base: 'FOG', t: 'It was such a [[foggy]] morning that we couldn’t see the lake.', h: 'Tính từ chỉ thời tiết, đuôi giống “misty”.' },
       { p: 3, base: 'BREATH', t: 'The view from the summit was absolutely [[breathtaking]].', h: 'Tính từ ghép: đẹp đến “nín thở”.', ult: true },
@@ -552,6 +554,10 @@ const BOSSES = [
       { p: 4, first: 'It annoys me that Tom arrives late so often.', key: 'ALWAYS', t: 'Tom [[is always arriving late|\'s always arriving late|is always coming late|\'s always coming late]], which annoys me.', h: '“always” + hiện tại tiếp diễn để phàn nàn.', ult: true },
       { p: 4, first: 'This bike belongs to my brother.', key: 'OWNS', t: 'My brother [[owns this bike]].', h: 'Động từ trạng thái chỉ sở hữu.', ult: true },
       { p: 4, first: 'What’s your opinion of the new teacher?', key: 'THINK', t: 'What [[do you think of|do you think about]] the new teacher?', h: '“think” = có ý kiến → thì đơn.', ult: true },
+      { p: 4, first: 'I played the piano as a child, but I don’t play it any more.', key: 'USED', t: 'I [[used to play the piano|used to play piano]] as a child.', h: 'Thói quen trong quá khứ, bây giờ không còn: used to + V.', ult: true },
+      { p: 4, first: 'Living in the countryside still feels strange to me.', key: 'USED', t: 'I [[am not used to living|’m not used to living|am still not used to living|’m still not used to living]] in the countryside.', h: 'be used to + V-ing = đã quen. Câu phủ định ở hiện tại.', ult: true },
+      { p: 4, first: 'The phone rang in the middle of my shower.', key: 'HAVING', t: 'The phone rang while I [[was having a shower|was having my shower]].', h: 'Việc đang diễn ra thì bị xen vào: quá khứ tiếp diễn.', ult: true },
+      { p: 4, first: 'Every evening my grandfather told us a story.', key: 'WOULD', t: 'My grandfather [[would tell us a story|would tell us stories]] every evening.', h: 'would + V = thói quen (hành động) trong quá khứ.', ult: true },
     ] },
 ];
 

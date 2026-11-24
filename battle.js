@@ -82,7 +82,7 @@ const PART_HOW = {
 };
 function bossQuestions(B){
   return B.qs.map((x, i) => ({ k: B.id + '-' + (i + 1), id: B.id + '-' + (i + 1), label: String(i + 1), ti: 0, tok: toks(x.t)[0], h: x.h, ult: !!x.ult,
-    part: x.p, base: x.base, first: x.first, key: x.key, it: { t: x.t }, e: { type: 'list', how: PART_HOW[x.p] } }));
+    part: x.p, base: x.base, first: x.first, key: x.key, it: { t: x.t }, e: { type: 'list', how: PART_HOW[x.p], trans: x.p === 4 } }));
 }
 const bossOpen = B => OPEN_WEEK >= B.after || (PREVIEW && QP.get('boss') === B.id);
 
