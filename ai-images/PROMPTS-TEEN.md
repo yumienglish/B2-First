@@ -72,3 +72,42 @@ A set of 3 small enemy creatures called Mistake Phantoms, side by side in one ro
 3 (right) a small corrupted golem made of broken pixel blocks with red glowing cracks.
 Full body, facing the viewer. Transparent background (PNG). Square format 1:1.
 ```
+
+---
+# Hình cho trận đấu kiểu game đối kháng 2D (25/11)
+
+## 10. `fighter-teen.png` – nhân vật teen 6 tư thế (quay sang PHẢI)
+```
+Fighting-game character sprite sheet: one HUMAN 15-year-old student gamer (not an animal) with short dark hair, a black techwear hoodie with neon cyan and magenta trim, a gaming headset around his neck, fingerless gloves, black joggers and chunky sneakers. Side view, the character always FACES RIGHT. 6 poses in a 3 × 2 grid, each alone in its own equal cell with clear empty space, not touching, all at the same scale with feet on the same baseline:
+Top row: 1) fighting stance, fists up; 2) strong straight punch forward with a motion blur on the fist; 3) flying side kick.
+Bottom row: 4) both palms pushed forward firing an energy blast (glowing cyan energy at the hands); 5) hit and knocked back, leaning backwards in pain; 6) victory pose, one fist raised high.
+Full body, dynamic 2D fighting-game splash art, sharp angular shapes, neon rim light. No text, no letters, no logos. Transparent background (PNG). Landscape 3:2.
+```
+
+## 11. `fighter-boss1.png` – Tense Titan 4 tư thế (quay sang TRÁI)
+```
+Fighting-game boss sprite sheet of the SAME Tense Titan as before: a giant armoured mech titan with a glowing clock face and turning gears in its chest, cyan and magenta lights. Side view, it always FACES LEFT. 4 poses in a 2 × 2 grid, each alone in its own equal cell with clear empty space, not touching, same scale, feet on the same baseline:
+1 (top left) standing guard, fists ready; 2 (top right) lunging forward with a huge punch; 3 (bottom left) hit and staggering backwards, sparks flying from its armour; 4 (bottom right) defeated, collapsed on one knee, cracked and smoking.
+Full body, 2D fighting-game art, neon rim light, menacing but no gore. No text. Transparent background (PNG). Square 1:1.
+```
+
+## 12. `fighter-phantoms.png` – 3 Mistake Phantom, 2 tư thế mỗi con (quay sang TRÁI)
+```
+Fighting-game enemy sprite sheet of the SAME three Mistake Phantoms as before (1 a glitchy hooded phantom with glowing red eyes and red X marks, 2 a shadow ninja made of black smoke with a glowing red visor, 3 a small corrupted golem of broken pixel blocks with red glowing cracks). Side view, all FACE LEFT. 3 columns (one per enemy) × 2 rows, each pose alone in its own equal cell with clear empty space, not touching:
+Top row: each enemy attacking, lunging forward to the left.
+Bottom row: each enemy hit and knocked backwards.
+Full body, 2D fighting-game art, neon rim light. No text. Transparent background (PNG). Landscape 3:2.
+```
+
+## 13. `arena-boss1.png` – sân đấu Boss 1 (nhìn ngang)
+```
+A side-view 2D fighting-game stage background: the ruins of a giant neon clock tower at night, with broken gears and glowing clock hands in the distance, a cyberpunk city skyline behind, purple and cyan sky with light rays. A clear flat stone ground platform across the bottom quarter of the image for two fighters to stand on. The centre is open and uncluttered. No characters, no text, no letters, no numbers. Wide landscape 16:9.
+```
+
+## 14. `fx-sheet.png` – 6 hiệu ứng đòn đánh
+```
+A 2D fighting-game visual effects sprite sheet, 6 effects in a 3 × 2 grid, each alone in its own equal cell with clear empty space, not touching, bright glowing colours on a transparent background:
+Top row: 1) a glowing cyan energy ball with a short light trail; 2) a blazing orange fireball with flames trailing to the left; 3) a big white-yellow hit impact burst with sharp spikes.
+Bottom row: 4) a curved bright cyan-white slash arc; 5) an expanding magenta-cyan shockwave ring seen from the side; 6) a puff of grey-brown dust cloud.
+No characters, no text. Transparent background (PNG). Landscape 3:2.
+```

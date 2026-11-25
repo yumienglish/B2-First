@@ -846,3 +846,76 @@ body.rk-5 .av,body.rk-6 .av{animation:rkglow 2s ease-in-out infinite}
 .bt .tvi{color:#fff} .bt .tph{color:#9ba5d8}
 .ex.trans .gw{display:block;width:100%;margin-top:4px}
 .tph{line-height:1.45}
+
+/* ===================== TRẬN ĐẤU KIỂU GAME ĐỐI KHÁNG 2D (25/11) ===================== */
+.bt{background:#06080f;display:flex;flex-direction:column}
+.ar{position:relative;flex:none;height:46vh;min-height:250px;overflow:hidden;border-bottom:2px solid #2b3466;box-shadow:0 6px 24px rgba(0,0,0,.6)}
+@media (min-width:700px){.ar{height:58vh}}
+.ar-cam{position:absolute;inset:0;transform-origin:50% 70%;will-change:transform}
+.ar-bg{position:absolute;inset:-3% -7%;background:#0b0f1e center 82%/cover no-repeat;animation:arpan 16s ease-in-out infinite alternate}
+@keyframes arpan{to{transform:translateX(-4%)}}
+.ar-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,.55),transparent 28%,transparent 72%,rgba(6,8,15,.55))}
+.ar-dark{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 30% 60%,rgba(40,20,0,.35),rgba(3,4,10,.82));opacity:0;transition:opacity .35s;pointer-events:none}
+.bt.ult .ar-dark{opacity:1}
+.ftr{position:absolute;bottom:10%;z-index:2;pointer-events:none}
+.ftr.p{left:5%} .ftr.e{right:5%}
+.ftr img{display:block;max-width:none;object-fit:contain;transform-origin:50% 100%;filter:drop-shadow(0 0 10px rgba(34,227,255,.25))}
+.ftr.e img{filter:drop-shadow(0 0 12px rgba(255,46,136,.3))}
+.ftr.e{display:flex;justify-content:flex-end}
+.ftr[data-pose="idle"] img{animation:breathe 1.5s ease-in-out infinite}
+@keyframes breathe{50%{transform:scaleY(.982) translateY(1%)}}
+.ftr::after{content:"";position:absolute;left:8%;right:8%;bottom:-7px;height:16px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.65),transparent 70%);z-index:-1}
+.bt-cv{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.bt.hurt .ar::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 120px rgba(255,23,68,.8)}
+/* HUD */
+.bth{position:absolute;left:0;right:0;top:0;z-index:6;display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start;padding:8px clamp(8px,2vw,24px) 14px;background:linear-gradient(180deg,rgba(6,8,15,.9),rgba(6,8,15,0))}
+.bth-side{min-width:0}
+.bth-side.r{text-align:right}
+.bth-name{display:flex;align-items:center;gap:8px;min-width:0;font-family:Rajdhani,Nunito,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;font-size:clamp(13px,1.8vw,18px);line-height:1.05}
+.bth-name span{display:flex;flex-direction:column;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bth-name small{font-size:11px;color:#ffc83d;letter-spacing:.1em}
+.bth-side.r .bth-name{justify-content:flex-end}
+.bth-side.r .bth-name span{align-items:flex-end}
+.bth-name .av{width:34px;height:34px;font-size:20px;flex:none}
+.bth .hp{margin-top:5px;height:14px;transform:skewX(-14deg)}
+.bth .hp.r{transform:skewX(14deg)}
+.bth .hp.r .fill,.bth .hp.r .trail{left:auto;right:0}
+.bth .hp .ko{width:3px}
+.ki{position:relative;height:8px;margin-top:5px;width:78%;border-radius:3px;background:#1b2246;box-shadow:inset 0 0 0 1px #2b3466;overflow:hidden;transform:skewX(-14deg)}
+.ki i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#ffc83d,#ff7a2e);transition:width .45s}
+.ki.full i{box-shadow:0 0 12px #ffc83d;animation:kiflash .7s infinite}
+@keyframes kiflash{50%{filter:brightness(1.7)}}
+.bth .bt-hint{font-size:11px;margin-top:4px;color:#9ba5d8}
+.bth-mid{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:Rajdhani,Nunito,sans-serif;font-weight:700;color:#fff;line-height:1}
+.bth-mid b{font-size:clamp(20px,3vw,30px);color:#ff2e88;text-shadow:0 0 12px #ff2e88;letter-spacing:.05em;font-style:italic}
+.bth-mid span{font-size:13px;color:#c8d0ff;letter-spacing:.08em}
+.bth-mid .bt-x{width:32px;height:32px;font-size:14px;margin-top:4px}
+/* kỹ năng */
+.bsk{position:absolute;right:clamp(8px,2vw,24px);bottom:12px;z-index:6;display:flex;gap:12px}
+.bsk button{position:relative;width:clamp(48px,7vw,64px);height:clamp(48px,7vw,64px);border-radius:50%;border:3px solid #2b3466;color:#fff;font-size:clamp(20px,3vw,28px);cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#45509a,#141a33 70%);box-shadow:0 4px 0 #06080f,inset 0 0 12px rgba(0,0,0,.6);transition:transform .1s}
+.bsk button small{position:absolute;left:50%;bottom:-15px;transform:translateX(-50%);font-family:Rajdhani,Nunito,sans-serif;font-weight:700;font-size:10px;letter-spacing:.1em;color:#9ba5d8}
+.bsk button:disabled{cursor:default}
+.bsk .shd{opacity:.5;filter:grayscale(.8)}
+.bsk .shd.on{opacity:1;filter:none;border-color:#22e3ff;box-shadow:0 4px 0 #06080f,0 0 20px #22e3ff}
+.bsk .shd.on small{color:#22e3ff}
+.bsk .sup:not(.ready){opacity:.5;filter:grayscale(.8)}
+.bsk .sup.ready{border-color:#ffc83d;box-shadow:0 4px 0 #06080f,0 0 0 4px rgba(255,200,61,.25),0 0 26px #ffc83d;animation:supready 1s ease-in-out infinite}
+.bsk .sup.ready small{color:#ffc83d}
+.bsk .sup.ready:not(:disabled):active{transform:scale(.92)}
+@keyframes supready{50%{box-shadow:0 4px 0 #06080f,0 0 0 8px rgba(255,200,61,.15),0 0 40px #ffc83d}}
+.bt-combo{position:absolute;left:50%;top:30%;transform:translateX(-50%);z-index:6;font-family:Rajdhani,Nunito,sans-serif;font-weight:700;font-style:italic;font-size:clamp(22px,4vw,40px);color:#ffc83d;text-shadow:0 0 16px rgba(255,200,61,.8),0 3px 0 #000;white-space:nowrap;pointer-events:none}
+/* chữ lớn giữa sân */
+.bt-ban{position:absolute;left:50%;top:48%;z-index:7;pointer-events:none;white-space:nowrap;font-family:Rajdhani,Nunito,sans-serif;font-weight:700;font-style:italic;letter-spacing:.08em;font-size:clamp(34px,8vw,84px);color:#fff;text-shadow:0 0 22px #22e3ff,0 6px 0 #000}
+.bt-ban.ult{color:#fff;text-shadow:0 0 24px #ffc83d,0 0 60px #ff7a2e,0 6px 0 #000}
+.bt-ban.ko{color:#ffc83d;font-size:clamp(60px,14vw,140px);text-shadow:0 0 30px #ff2e88,0 8px 0 #000}
+.bt-ban.lose{color:#ff5277;text-shadow:0 0 24px #ff1744,0 6px 0 #000}
+.bt-ban.blk{color:#9ff3ff;font-size:clamp(26px,5vw,48px);top:36%}
+.bt-ban.ki{color:#ffc83d;font-size:clamp(22px,4.4vw,42px);top:34%}
+.bt-ban.start{color:#fff;text-shadow:0 0 22px #ff2e88,0 6px 0 #000}
+/* khung câu hỏi bên dưới */
+.bt .bt-q{flex:1;min-height:0;max-height:none;margin:10px auto 12px;overflow:auto}
+.bt-ends.sk{color:#9ba5d8;font-size:14px}
+.bt-endmas{height:150px;width:auto}
+@media (max-width:620px){.bth{padding:6px 8px 12px;gap:6px}.bth-name .av{width:28px;height:28px}.bth .bt-hint{display:none}.bt .bt-q{margin:8px auto}}
+@media (prefers-reduced-motion:reduce){.ar-bg,.ftr[data-pose="idle"] img{animation:none}}

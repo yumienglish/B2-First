@@ -532,7 +532,7 @@ const LESSONS = {
    after = mở khi OPEN_WEEK >= after (cô xem trước: ?boss=boss1&preview).
    ===================================================================== */
 const BOSSES = [
-  { id: 'boss1', after: 4, name: 'Tense Titan', img: 'boss-1', units: 'Unit 1 · Unit 2 · Unit 25',
+  { id: 'boss1', after: 4, name: 'Tense Titan', img: 'boss-1', fx: 'b1', arena: 'arena-1', units: 'Unit 1 · Unit 2 · Unit 25',
     qs: [
       { p: 1, t: 'From the top of the hill we had a breathtaking ((*view/sight/look/scene)) of the whole valley.', h: 'have a … of something = nhìn thấy toàn cảnh.' },
       { p: 1, t: 'The path to the waterfall was very ((*steep/high/tall/sharp)), so we walked slowly.', h: 'Đường dốc đứng, khó đi lên.' },
