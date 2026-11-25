@@ -20,7 +20,12 @@
      box = khung từ (~ = từ đã dùng ở ví dụ) · only = chỉ chấp nhận từ trong khung · sents = câu A–G (Reading Part 6)
      track = audio trong audio/ · img = ảnh trong img/ · tip = mẹo làm bài
    ===================================================================== */
-const OPEN_WEEK = 2;            // tuần 2 = Grammar Unit 2 (mở 24/11)
+// tuần 2 = Grammar Unit 2 (mở 24/11)
+/* ---- MỞ TUẦN ----
+   OPEN_WEEK_SET = tuần mở tay (như trước đây). OPEN_DATES = ngày TỰ MỞ từng tuần (0h giờ Việt Nam), VD { 3: '2026-12-01', 4: '2026-12-08' }:
+   đến ngày đó tuần tự mở, không cần sửa số. Chỉ tự mở khi tuần đó đã có bài. Tuần chưa mở vẫn xem trước được bằng ?preview. */
+const OPEN_WEEK_SET = 2;
+const OPEN_DATES = {};
 
 // Máy chủ nhận bài (Code.gs dùng chung với các trang BTVN khác)
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAom9bBpL0ms0VD7_bz5w691011llkFzttYSjKDyRyMCjLLeUZ4EZGGJLtLMFWuiV4sA/exec';
@@ -568,3 +573,6 @@ const BOSSES = [
    newWords = từ cần chép vở. Link riêng: ?sq=<id> (cô xem trước: &preview).
    ===================================================================== */
 const SIDEQUESTS = [];
+
+// Tuần đang mở = số lớn nhất giữa OPEN_WEEK_SET và các mục OPEN_DATES đã tới ngày (giờ VN) + đã có bài
+const OPEN_WEEK = Object.keys(OPEN_DATES).reduce((w, k) => (+k > w && LESSONS[k] && Date.parse(OPEN_DATES[k] + 'T00:00:00+07:00') <= Date.now() ? +k : w), OPEN_WEEK_SET);
