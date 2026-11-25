@@ -34,6 +34,7 @@ function noise(a, { t0 = 0, dur, vol = .3, freq = 1200, q = .7 }){
 }
 function bsfx(kind){
   const a = actx(); if (!a) return;
+  if (realSfx(kind)) return;
   if (kind === 'zap'){ tone(a, { type: 'square', f0: 1400, f1: 220, dur: .22, vol: .08 }); }
   else if (kind === 'hit'){ noise(a, { dur: .25, vol: .45, freq: 2500 }); tone(a, { f0: 160, f1: 50, dur: .25, vol: .35 }); }
   else if (kind === 'crit'){ noise(a, { dur: .35, vol: .5, freq: 4000 }); tone(a, { type: 'square', f0: 900, f1: 1800, dur: .12, vol: .07 }); tone(a, { f0: 120, f1: 40, dur: .35, vol: .4 }); }
@@ -52,6 +53,74 @@ function bsfx(kind){
   else if (kind === 'super'){ tone(a, { f0: 120, f1: 1600, dur: 1.2, vol: .14 }); tone(a, { type: 'triangle', f0: 60, f1: 900, dur: 1.2, vol: .1 }); noise(a, { dur: 1.1, vol: .12, freq: 2400 }); }
   else if (kind === 'start'){ [262, 392, 523].forEach((f, i) => tone(a, { type: 'square', f0: f, t0: i * .09, dur: .14, vol: .06 })); }
 }
+
+/* ---------- Âm thanh thật (file CC0: Kenney + "Battle Theme A" cynicmusic, xem audio/*LICENSE*) ---------- */
+// Mỗi đòn = nhiều lớp tiếng chồng nhau, cao độ lệch ngẫu nhiên ±6% để không lặp nhàm; có tiếng vang + bộ nén.
+const SFX_FILES = ['punch1', 'punch2', 'punch3', 'heavy1', 'heavy2', 'heavy3', 'body', 'swish1', 'swish2', 'swish3', 'slash1', 'slash2',
+  'laser1', 'laser2', 'beam', 'boom1', 'boom2', 'bigboom', 'field', 'clang', 'j-start', 'j-ready', 'j-ko', 'j-win', 'j-lose'];
+const SND = { buf: {}, loading: null, bus: null, wet: null, music: null, mGain: null, mBase: .22 };
+function sndBus(a){
+  if (SND.bus && SND.bus.context === a) return SND.bus;
+  const comp = a.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.attack.value = .003; comp.release.value = .2;
+  comp.connect(a.destination);
+  const bus = a.createGain(); bus.gain.value = .9; bus.connect(comp);
+  // tiếng vang: xung nhiễu tắt dần 1.4 s
+  const len = a.sampleRate * 1.4, ir = a.createBuffer(2, len, a.sampleRate);
+  for (let c = 0; c < 2; c++){ const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+  const conv = a.createConvolver(); conv.buffer = ir; const wet = a.createGain(); wet.gain.value = .35; conv.connect(wet); wet.connect(comp);
+  SND.bus = bus; SND.wet = conv; return bus;
+}
+function loadSfx(){
+  const a = actx(); if (!a || SND.loading) return SND.loading;
+  sndBus(a);
+  SND.loading = Promise.all(SFX_FILES.map(n => fetch('audio/sfx/' + n + '.mp3').then(r => r.arrayBuffer()).then(b => new Promise((ok, no) => a.decodeAudioData(b, ok, no))).then(buf => { SND.buf[n] = buf; }).catch(() => {})));
+  return SND.loading;
+}
+// phát 1 lớp: tên (hoặc mảng tên để chọn ngẫu nhiên), âm lượng, trễ (giây), tốc độ, tiếng vang
+function play(name, { vol = 1, delay = 0, rate = 1, rev = 0, jitter = .06 } = {}){
+  const a = actx(); if (!a) return false;
+  const n = Array.isArray(name) ? name[Math.floor(Math.random() * name.length)] : name, buf = SND.buf[n]; if (!buf) return false;
+  const s = a.createBufferSource(), g = a.createGain(), bus = sndBus(a);
+  s.buffer = buf; s.playbackRate.value = rate * (1 + (Math.random() * 2 - 1) * jitter); g.gain.value = vol;
+  s.connect(g); g.connect(bus); if (rev){ const r = a.createGain(); r.gain.value = rev; g.connect(r); r.connect(SND.wet); }
+  s.start(a.currentTime + delay); return true;
+}
+const PUNCH = ['punch1', 'punch2', 'punch3'], HEAVY = ['heavy1', 'heavy2', 'heavy3'], SWISH = ['swish1', 'swish2', 'swish3'], SLASH = ['slash1', 'slash2'], LASER = ['laser1', 'laser2'], BOOM = ['boom1', 'boom2'];
+function realSfx(kind){
+  if (!SND.buf.punch1) return false; // chưa tải xong → dùng âm thanh tự tạo
+  switch (kind){
+    case 'punch': play(PUNCH, { vol: 1 }); play('body', { vol: .55, rate: 1.1 }); return true;
+    case 'kick': play(HEAVY, { vol: 1 }); play('body', { vol: .6, rate: .9 }); return true;
+    case 'whoosh': play(SWISH, { vol: .55, rate: 1.15 }); return true;
+    case 'hit': play(HEAVY, { vol: .9 }); return true;
+    case 'crit': play(HEAVY, { vol: 1 }); play(BOOM, { vol: .45, rate: 1.3, rev: .25 }); return true;
+    case 'zap': play(LASER, { vol: .75 }); return true;
+    case 'laser': play('beam', { vol: .9, rate: .9, rev: .3 }); play(LASER, { vol: .6, rate: .7, delay: .05 }); return true;
+    case 'slash': play(SLASH, { vol: .9, rev: .2 }); play('clang', { vol: .35, rate: 1.3 }); return true;
+    case 'boom': play(BOOM, { vol: .9, rev: .5 }); play('bigboom', { vol: .9, rev: .4 }); return true;
+    case 'hurt': play(HEAVY, { vol: 1, rate: .85 }); play('body', { vol: .8, rate: .8 }); duck(.4, .5); return true;
+    case 'shield': play('field', { vol: .8, rate: 1.2 }); play('clang', { vol: .7, rev: .35 }); return true;
+    case 'charge': play('field', { vol: .55, rate: 1.4 }); return true;
+    case 'ki': play('j-ready', { vol: .7, jitter: 0 }); return true;
+    case 'super': play('field', { vol: .7, rate: .75, rev: .4 }); play('beam', { vol: .4, rate: .6, delay: .5 }); duck(.35, 2.4); return false; // + tiếng nạp tự tạo
+    case 'start': play('j-start', { vol: .8, jitter: 0 }); return true;
+    case 'win': fadeMusic(); play('j-ko', { vol: .8, jitter: 0 }); play('j-win', { vol: .85, jitter: 0, delay: .7 }); return true;
+    case 'lose': fadeMusic(); play('j-lose', { vol: .8, jitter: 0 }); return true;
+  }
+  return false;
+}
+/* nhạc nền trận đấu: <audio> lặp + GainNode (iPhone không cho chỉnh volume của <audio> trực tiếp) */
+function startMusic(){
+  stopMusic(); if (!soundOn()) return;
+  const a = actx(); if (!a) return;
+  const el = new Audio('audio/battle-music.mp3'); el.loop = true; el.preload = 'auto';
+  try { const src = a.createMediaElementSource(el), g = a.createGain(); g.gain.value = .0001; src.connect(g); g.connect(a.destination);
+    g.gain.exponentialRampToValueAtTime(SND.mBase, a.currentTime + 1.5); SND.mGain = g; } catch (e) { el.volume = .25; }
+  SND.music = el; el.play().catch(() => {});
+}
+function duck(to = .4, secs = 1){ const a = actx(), g = SND.mGain; if (!a || !g) return; const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(SND.mBase * to, t + .08); g.gain.linearRampToValueAtTime(SND.mBase, t + secs); }
+function fadeMusic(){ const a = actx(), g = SND.mGain; if (a && g){ const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(.0001, t + .6); } setTimeout(stopMusic, 700); }
+function stopMusic(){ if (SND.music){ try { SND.music.pause(); } catch (e) {} SND.music.src = ''; SND.music = null; } SND.mGain = null; }
 
 /* ---------- Câu hỏi: lấy từ bài học (Revenge) hoặc từ BOSSES ---------- */
 function questionsOf(L){
@@ -343,7 +412,7 @@ async function blockMove(){ // khiên chặn đòn
 /* ---------- Trận đấu ---------- */
 // cfg: { mode, title, enemy: { name, prefix, legacy, arena, size }, qs, ko: % máu địch còn lại tối đa để thắng, canKO (em có thể bị hạ gục) }
 function startBattle(cfg){
-  loadFx();
+  loadFx(); loadSfx(); startMusic();
   const me = lsGet(ME_KEY) || {}, qs = cfg.qs;
   const totalW = qs.reduce((s, q) => s + (q.ult ? 2 : 1), 0);
   const B = { i: 0, ehp: 100, php: 100, combo: 0, maxCombo: 0, res: [], lost: 0, ki: 0, shield: false, supers: 0, blocks: 0, busy: false, startedAt: new Date().toISOString(), over: false };
@@ -365,7 +434,7 @@ function startBattle(cfg){
           <div class="hp"><i class="trail" id="pTrail"></i><i class="fill p" id="pFill"></i></div>
           <div class="ki" id="kiBar" title="Energy"><i id="kiFill"></i></div>
         </div>
-        <div class="bth-mid"><b>VS</b><span id="btCount"></span><button class="bt-x" type="button" aria-label="Thoát">✕</button></div>
+        <div class="bth-mid"><b>VS</b><span id="btCount"></span><span class="bt-btns"><button class="bt-snd" id="btSnd" type="button" aria-label="Sound">${soundOn() ? "🔊" : "🔇"}</button><button class="bt-x" type="button" aria-label="Thoát">✕</button></span></div>
         <div class="bth-side r">
           <div class="bth-name"><span>${esc(cfg.enemy.name)}<small>${esc(cfg.title)}</small></span></div>
           <div class="hp r big"><i class="trail" id="eTrail"></i><i class="fill" id="eFill"></i><span class="ko" style="right:${cfg.ko}%" title="KO line"></span></div>
@@ -403,9 +472,10 @@ function startBattle(cfg){
     sup.disabled = !ok; sup.classList.toggle('ready', B.ki >= 100 && !B.done);
     $('#skShield').classList.toggle('on', B.shield);
   };
-  const close = () => { B.over = true; FX.cv = null; window.removeEventListener('resize', layout); ov.remove(); document.body.classList.remove('noscroll'); document.removeEventListener('keydown', onKey); if (!LESSON) renderHome(); };
+  const close = () => { B.over = true; FX.cv = null; stopMusic(); window.removeEventListener('resize', layout); ov.remove(); document.body.classList.remove('noscroll'); document.removeEventListener('keydown', onKey); if (!LESSON) renderHome(); };
   const onKey = ev => { if (ev.key === 'Escape' && B.done) close(); };
   document.addEventListener('keydown', onKey);
+  $('#btSnd').onclick = () => { lsSet(SND_KEY, !soundOn()); $('#btSnd').textContent = soundOn() ? '🔊' : '🔇'; if (soundOn()){ loadSfx(); if (!B.done) startMusic(); } else stopMusic(); paintSnd(); };
   ov.querySelector('.bt-x').onclick = () => { if (B.done || confirmQuit()) close(); };
   function confirmQuit(){ return window.confirm('Thoát trận? Kết quả trận này sẽ không được tính.'); }
   const lockUI = on => $$('#btQ .bt-opt, #btQ .bt-in, #btQ button').forEach(x => { if (on) x.disabled = true; else if (!B.cur.lock) x.disabled = false; });
@@ -503,7 +573,7 @@ function startBattle(cfg){
       ${r.msg ? `<div class="bt-endm">${r.msg}</div>` : ''}
       <div class="gbtns">${r.again ? '<button class="btn orange" type="button" id="btAgain">Fight again 🔁</button>' : ''}<button class="btn lite" type="button" id="btClose">Close</button></div></div>`;
     $('#btClose').onclick = close;
-    const ag = $('#btAgain'); if (ag) ag.onclick = () => { B.over = true; FX.cv = null; window.removeEventListener('resize', layout); ov.remove(); document.body.classList.remove('noscroll'); document.removeEventListener('keydown', onKey); r.again(); };
+    const ag = $('#btAgain'); if (ag) ag.onclick = () => { B.over = true; FX.cv = null; stopMusic(); window.removeEventListener('resize', layout); ov.remove(); document.body.classList.remove('noscroll'); document.removeEventListener('keydown', onKey); r.again(); };
   }
   setHP(); show();
   // mở màn: hai bên bước vào sân, chữ FIGHT!

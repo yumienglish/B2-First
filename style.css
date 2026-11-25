@@ -919,3 +919,5 @@ body.rk-5 .av,body.rk-6 .av{animation:rkglow 2s ease-in-out infinite}
 .bt-endmas{height:150px;width:auto}
 @media (max-width:620px){.bth{padding:6px 8px 12px;gap:6px}.bth-name .av{width:28px;height:28px}.bth .bt-hint{display:none}.bt .bt-q{margin:8px auto}}
 @media (prefers-reduced-motion:reduce){.ar-bg,.ftr[data-pose="idle"] img{animation:none}}
+.bt-btns{display:flex;gap:6px;margin-top:4px}
+.bth-mid .bt-btns button{width:32px;height:32px;font-size:14px;margin:0;border-radius:50%;border:2px solid #2b3466;background:rgba(11,15,30,.7);color:#fff;cursor:pointer}
