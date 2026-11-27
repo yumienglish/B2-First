@@ -3,7 +3,7 @@
 ## Cách làm
 1. Mở ChatGPT, chọn tạo hình (Create image).
 2. Với mỗi hình bên dưới: copy **cả đoạn STYLE** + **đoạn prompt của hình đó**, dán vào ChatGPT, gửi.
-3. Tải ảnh về, lưu vào thư mục `D:\b2-first\ai-images\` với **đúng tên file** ghi ở mỗi hình (ví dụ `u1-grammar.png`).
+3. Tải ảnh về, lưu vào thư mục `D:\8 Web bai tap\b2-first\ai-images\` với **đúng tên file** ghi ở mỗi hình (ví dụ `u1-grammar.png`).
 4. Lưu xong báo mình: mình sẽ nén ảnh, chèn vào bài và đưa lên web.
 
 Hình nào chưa có thì web tự ẩn chỗ đó, không bị lỗi. Nếu ChatGPT vẽ ra có chữ, cô bảo nó vẽ lại: *"Same picture, but remove all text and letters."*

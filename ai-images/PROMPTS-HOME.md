@@ -2,7 +2,7 @@
 
 ## Cách làm
 1. Mở ChatGPT → tạo hình. Mỗi hình: copy **STYLE** + **prompt của hình đó**, dán vào, gửi.
-2. Tải ảnh về, lưu vào `D:\b2-first\ai-images\` với **đúng tên file** ghi ở mỗi hình.
+2. Tải ảnh về, lưu vào `D:\8 Web bai tap\b2-first\ai-images\` với **đúng tên file** ghi ở mỗi hình.
 3. Lưu xong báo mình: mình cắt từng ô, nén ảnh, thay vào trang chủ.
 
 Mẹo:
